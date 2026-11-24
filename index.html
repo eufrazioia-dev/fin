@@ -445,6 +445,135 @@
                 <section id="view-receivables" class="hidden space-y-5">
                     <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm flex flex-wrap items-center justify-between gap-3">
                         <div>
+                            <h2 class="text-sm font-extrabold text-slate-800">Contas a Receber — Cartões de Crédito (Cielo) &amp; Convênios</h2>
+                            <p class="text-xs text-slate-500">Controle de vendas no crédito (à vista e parceladas D+30/60/90), baixa automática via extrato de recebíveis Cielo e lançamentos de convênios</p>
+                        </div>
+                        <div class="flex flex-wrap items-center gap-2">
+                            <button onclick="openCieloImportModal()" class="px-4 py-2 bg-unihealth-green hover:bg-unihealth-greenMid text-white text-xs font-bold rounded-xl shadow-sm flex items-center gap-1.5 transition-all">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
+                                <span>Importar Cielo (Vendas / Recebíveis .PDF)</span>
+                            </button>
+                            <button onclick="openConveniosModal()" class="px-3.5 py-2 bg-indigo-50 hover:bg-indigo-100 text-indigo-800 border border-indigo-200 text-xs font-bold rounded-xl transition-all">
+                                + Lançar Convênio Manual
+                            </button>
+                            <button onclick="openNewReceivableModal()" class="px-3.5 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl transition-all">
+                                + Lançar Recebível Avulso
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
+                        <!-- Card 1: A Receber no Mês Corrente (com data de corte editável para períodos superiores) -->
+                        <div onclick="filterReceivablesByCard('month')" class="bg-white p-4 rounded-2xl border border-emerald-200 hover:border-unihealth-green cursor-pointer shadow-sm transition-all">
+                            <div class="flex items-center justify-between gap-1">
+                                <span id="cr-kpi-month-title" class="text-[11px] font-bold uppercase text-unihealth-green">A Receber no Mês Corrente</span>
+                            </div>
+                            <p id="cr-kpi-month-open" class="text-xl font-extrabold text-slate-800 mt-1.5">R$ 0,00</p>
+                            <div class="flex items-center justify-between gap-1 mt-1.5" onclick="event.stopPropagation()">
+                                <span id="cr-kpi-month-sub" class="text-[10px] text-slate-500">Convênios + Cartões</span>
+                                <label class="flex items-center gap-1 text-[10px] font-semibold text-slate-600">
+                                    <span>Até:</span>
+                                    <input type="date" id="cr-cutoff-date" onchange="onReceivablesCutoffChange()" class="px-1.5 py-0.5 text-[10px] border border-slate-200 rounded bg-slate-50">
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Card 2: Cartão de Crédito (Total a Receber - vendas no crédito não recebidas) -->
+                        <div onclick="filterReceivablesByCard('credit_open')" class="bg-white p-4 rounded-2xl border border-sky-200 hover:border-sky-400 cursor-pointer shadow-sm transition-all">
+                            <div class="flex items-center justify-between">
+                                <span class="text-[11px] font-bold uppercase text-sky-700">Cartão de Crédito</span>
+                                <span class="text-[10px] font-bold bg-sky-50 text-sky-700 px-1.5 py-0.5 rounded">A Receber</span>
+                            </div>
+                            <p id="cr-kpi-cards-future" class="text-xl font-extrabold text-sky-800 mt-1.5">R$ 0,00</p>
+                            <p id="cr-kpi-cards-sub" class="text-[11px] text-slate-500 mt-0.5">0 parcela(s) de crédito em aberto</p>
+                        </div>
+
+                        <!-- Card 3: Convênios (abre imput manual direto ou filtra) -->
+                        <div onclick="openConveniosModal()" class="bg-white p-4 rounded-2xl border border-indigo-200 hover:border-indigo-400 cursor-pointer shadow-sm transition-all group">
+                            <div class="flex items-center justify-between">
+                                <span class="text-[11px] font-bold uppercase text-indigo-700">Convênios</span>
+                                <span class="text-[10px] font-bold bg-indigo-50 text-indigo-800 px-2 py-0.5 rounded-full group-hover:bg-indigo-600 group-hover:text-white transition-all">+ Lançar</span>
+                            </div>
+                            <p id="cr-kpi-convenios-open" class="text-xl font-extrabold text-indigo-800 mt-1.5">R$ 0,00</p>
+                            <p id="cr-kpi-convenios-sub" class="text-[11px] text-slate-500 mt-0.5">0 convênio(s) previsto(s) a receber</p>
+                        </div>
+
+                        <!-- Card 4: Recebidos no Mês Corrente -->
+                        <div onclick="filterReceivablesByCard('received_month')" class="bg-white p-4 rounded-2xl border border-slate-200 hover:border-unihealth-green cursor-pointer shadow-sm transition-all">
+                            <div class="flex items-center justify-between">
+                                <span class="text-[11px] font-bold uppercase text-slate-600">Recebidos no Mês Corrente</span>
+                                <span class="text-[10px] font-bold bg-emerald-50 text-unihealth-green px-1.5 py-0.5 rounded">Liquidado</span>
+                            </div>
+                            <p id="cr-kpi-received-month" class="text-xl font-extrabold text-unihealth-green mt-1.5">R$ 0,00</p>
+                            <p id="cr-kpi-received-sub" class="text-[11px] text-slate-500 mt-0.5">Cartões + Convênios recebidos no mês</p>
+                        </div>
+                    </div>
+
+                    <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm space-y-3">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <h3 class="text-xs font-extrabold uppercase text-slate-700">Cronograma Futuro — Cartão de Crédito (Parcelas em Aberto)</h3>
+                                <p class="text-[11px] text-slate-500">Previsão mensal de liquidação das parcelas de crédito (D+30, D+60, D+90...)</p>
+                            </div>
+                            <span id="cr-card-schedule-total" class="text-xs font-extrabold text-sky-700">Total a Receber: R$ 0,00</span>
+                        </div>
+                        <div id="cr-card-months-grid" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2.5"></div>
+                    </div>
+
+                    <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+                        <div class="p-4 border-b border-slate-200 flex flex-wrap items-center justify-between gap-3">
+                            <div class="flex flex-wrap items-center gap-2">
+                                <select id="cr-filter-origin" onchange="resetReceivablesPageAndRender()" class="px-3 py-2 text-xs border border-slate-200 rounded-xl bg-white font-semibold">
+                                    <option value="all">Todas as Origens</option>
+                                    <option value="Cartão de Crédito">Cartão de Crédito</option>
+                                    <option value="Convênio">Convênios</option>
+                                    <option value="Particular">Particular</option>
+                                </select>
+                                <select id="cr-filter-status" onchange="resetReceivablesPageAndRender()" class="px-3 py-2 text-xs border border-slate-200 rounded-xl bg-white font-semibold">
+                                    <option value="all">Todos os Status</option>
+                                    <option value="Previsto" selected>A Receber (Previsto)</option>
+                                    <option value="Recebido">Recebido / Liquidado</option>
+                                </select>
+                                <input type="text" id="cr-filter-search" oninput="debouncedRenderReceivables()" placeholder="Buscar convênio, bandeira ou venda..." class="px-3 py-2 text-xs border border-slate-200 rounded-xl w-60">
+                            </div>
+                            <div class="flex items-center gap-3">
+                                <span id="cr-count-label" class="text-xs text-slate-500">0 recebíveis</span>
+                                <button onclick="clearReceivablesFilters()" class="text-xs font-semibold text-unihealth-green hover:underline">Limpar filtros</button>
+                            </div>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left border-collapse text-xs">
+                                <thead>
+                                    <tr class="bg-slate-50 border-b border-slate-200 text-[10px] font-bold uppercase text-slate-500">
+                                        <th class="py-3 px-3">Data Prevista</th>
+                                        <th class="py-3 px-3">Origem</th>
+                                        <th class="py-3 px-3">Convênio / Bandeira</th>
+                                        <th class="py-3 px-3">Parcela</th>
+                                        <th class="py-3 px-3">Data Venda / Histórico</th>
+                                        <th class="py-3 px-3 text-right">Valor Líquido (R$)</th>
+                                        <th class="py-3 px-3 text-center">Status</th>
+                                        <th class="py-3 px-3 text-center">Ações</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="cr-tbody" class="divide-y divide-slate-100"></tbody>
+                            </table>
+                        </div>
+                        <div class="px-4 py-3 bg-slate-50 border-t border-slate-200 flex items-center justify-between text-xs text-slate-600">
+                            <span id="cr-pagination-info">Página 1 de 1</span>
+                            <div class="flex items-center gap-2">
+                                <button id="btn-cr-prev-page" onclick="changeReceivablesPage(-1)" class="px-3 py-1.5 bg-white border border-slate-200 rounded-lg font-semibold disabled:opacity-40">Anterior</button>
+                                <button id="btn-cr-next-page" onclick="changeReceivablesPage(1)" class="px-3 py-1.5 bg-white border border-slate-200 rounded-lg font-semibold disabled:opacity-40">Próxima</button>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ================================================= -->
+                <!-- MÓDULO 3: CONTAS A RECEBER & CARTÕES PARCELADOS   -->
+                <!-- ================================================= -->
+                <section id="view-receivables" class="hidden space-y-5">
+                    <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm flex flex-wrap items-center justify-between gap-3">
+                        <div>
                             <h2 class="text-sm font-extrabold text-slate-800">Contas a Receber — Cartões de Crédito Parcelados, Convênios &amp; Particulares</h2>
                             <p class="text-xs text-slate-500">Recebíveis identificados na CC 0001127-4 e projeção de parcelas futuras integradas ao fechamento do caixa</p>
                         </div>
@@ -1027,10 +1156,10 @@
                     </div>
                     <div>
                         <label class="block font-bold text-slate-600 mb-1">Parcela</label>
-                        <input type="text" id="er-installment" placeholder="1/1" class="w-full px-3 py-2 border border-slate-200 rounded-xl">
+                        <input type="text" id="er-installment" placeholder="01/03" class="w-full px-3 py-2 border border-slate-200 rounded-xl">
                     </div>
                     <div>
-                        <label class="block font-bold text-slate-600 mb-1">Valor (R$)</label>
+                        <label class="block font-bold text-slate-600 mb-1">Valor Líquido (R$)</label>
                         <input type="number" step="0.01" id="er-amount" required class="w-full px-3 py-2 border border-slate-200 rounded-xl">
                     </div>
                 </div>
@@ -1046,48 +1175,95 @@
         </div>
     </div>
 
-    <!-- MODAL 9: CONTROLE DE PROVISÕES (ANO ANTERIOR + 12 MESES) -->
-    <div id="provisions-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs hidden items-center justify-center p-4 z-50">
+    <!-- MODAL 7E: IMPUT MANUAL DE CONVÊNIOS A RECEBER -->
+    <div id="convenios-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs hidden items-center justify-center p-4 z-50">
         <div class="bg-white w-full max-w-3xl rounded-2xl shadow-2xl border border-slate-200 overflow-hidden flex flex-col max-h-[90vh]">
-            <div class="px-5 py-4 bg-amber-900 text-white flex items-center justify-between">
+            <div class="px-5 py-4 bg-indigo-950 text-white flex items-center justify-between">
                 <div>
-                    <h3 class="text-sm font-extrabold">Controle de Provisões Trabalhistas — CC 0001133-9</h3>
-                    <p class="text-[11px] text-amber-200">Saldo do ano anterior + provisão estimada mês a mês confrontada com o extrato</p>
+                    <h3 class="text-sm font-extrabold">Lançamento Manual de Convênios a Receber</h3>
+                    <p class="text-[11px] text-indigo-200">Informe o nome do convênio, o valor a receber e a data prevista — compõe os títulos a receber e o fluxo de caixa</p>
                 </div>
-                <button onclick="closeProvisionsModal()" class="text-white/80 hover:text-white text-xl font-bold">&times;</button>
+                <button onclick="closeConveniosModal()" class="text-white/80 hover:text-white text-xl font-bold">&times;</button>
             </div>
 
-            <div class="grid grid-cols-3 gap-3 p-4 bg-amber-50/50 border-b border-amber-100 text-xs">
-                <div class="bg-white p-3 rounded-xl border border-slate-200">
-                    <span class="text-[10px] font-bold uppercase text-slate-400">Total Devido Calculado</span>
-                    <p id="prov-modal-due" class="text-sm font-extrabold text-slate-800 mt-0.5">R$ 0,00</p>
+            <form onsubmit="saveNewConvenioReceivable(event)" class="p-4 bg-indigo-50/70 border-b border-indigo-100 grid grid-cols-1 sm:grid-cols-12 gap-2.5 items-end text-xs">
+                <div class="sm:col-span-5">
+                    <label class="block font-bold text-indigo-950 mb-1">Nome do Convênio</label>
+                    <input type="text" id="conv-name" required placeholder="Ex.: Bradesco Saúde, Cassi, Cemig Saúde, PASA..." class="w-full px-3 py-2 border border-indigo-200 rounded-xl bg-white">
                 </div>
-                <div class="bg-white p-3 rounded-xl border border-slate-200">
-                    <span class="text-[10px] font-bold uppercase text-slate-400">Guardado no Extrato (1133-9)</span>
-                    <p id="prov-modal-saved" class="text-sm font-extrabold text-amber-800 mt-0.5">R$ 0,00</p>
+                <div class="sm:col-span-3">
+                    <label class="block font-bold text-indigo-950 mb-1">Valor a Receber (R$)</label>
+                    <input type="number" step="0.01" id="conv-amount" required placeholder="0,00" class="w-full px-3 py-2 border border-indigo-200 rounded-xl bg-white font-bold">
                 </div>
-                <div class="bg-white p-3 rounded-xl border border-slate-200">
-                    <span class="text-[10px] font-bold uppercase text-slate-400">Situação / Diferença</span>
-                    <p id="prov-modal-diff" class="text-sm font-extrabold text-emerald-700 mt-0.5">R$ 0,00</p>
+                <div class="sm:col-span-2">
+                    <label class="block font-bold text-indigo-950 mb-1">Data Recebimento</label>
+                    <input type="date" id="conv-date" required class="w-full px-2.5 py-2 border border-indigo-200 rounded-xl bg-white">
                 </div>
-            </div>
+                <div class="sm:col-span-2">
+                    <button type="submit" class="w-full py-2 bg-unihealth-green hover:bg-unihealth-greenMid text-white font-bold rounded-xl shadow-sm transition-all">
+                        + Incluir
+                    </button>
+                </div>
+                <div class="sm:col-span-12">
+                    <input type="text" id="conv-notes" placeholder="Observação opcional (ex.: Lote faturamento 11/2026, guia, protocolo...)" class="w-full px-3 py-1.5 border border-indigo-200 rounded-xl bg-white text-[11px]">
+                </div>
+            </form>
 
-            <div class="overflow-y-auto flex-1 p-4">
+            <div class="p-4 overflow-y-auto flex-1">
+                <div class="flex items-center justify-between mb-2">
+                    <span class="text-xs font-extrabold uppercase text-slate-600">Convênios Previstos Cadastrados</span>
+                    <span id="conv-modal-total" class="text-xs font-extrabold text-indigo-800">Total Previsto: R$ 0,00</span>
+                </div>
                 <table class="w-full text-left border-collapse text-xs">
                     <thead>
                         <tr class="bg-slate-50 border-b border-slate-200 text-[10px] font-bold uppercase text-slate-500">
-                            <th class="py-2 px-3">Referência / Competência</th>
-                            <th class="py-2 px-3">Provisão a Guardar (R$)</th>
-                            <th class="py-2 px-3 text-right">Acumulado Devido (R$)</th>
+                            <th class="py-2 px-3">Convênio</th>
+                            <th class="py-2 px-3">Data Recebimento</th>
+                            <th class="py-2 px-3">Observação</th>
+                            <th class="py-2 px-3 text-right">Valor (R$)</th>
+                            <th class="py-2 px-3 text-center">Ações</th>
                         </tr>
                     </thead>
-                    <tbody id="provisions-tbody" class="divide-y divide-slate-100"></tbody>
+                    <tbody id="conv-modal-tbody" class="divide-y divide-slate-100"></tbody>
                 </table>
             </div>
 
+            <div class="px-5 py-3 bg-slate-50 border-t border-slate-200 flex justify-end">
+                <button onclick="closeConveniosModal()" class="px-4 py-2 text-xs font-bold text-white bg-unihealth-green rounded-xl">Concluir</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL 7F: IMPORTAR EXTRATO DE VENDAS E RECEBÍVEIS CIELO (.PDF) -->
+    <div id="cielo-import-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs hidden items-center justify-center p-4 z-50">
+        <div class="bg-white w-full max-w-2xl rounded-2xl shadow-2xl border border-slate-200 overflow-hidden">
+            <div class="px-5 py-4 bg-[#013A19] text-white flex items-center justify-between">
+                <div>
+                    <h3 class="text-sm font-extrabold">Importar Extratos Cielo — Vendas &amp; Recebíveis (.PDF)</h3>
+                    <p class="text-[11px] text-emerald-200">Lê simultaneamente "Detalhado de Vendas Cielo" (gera parcelas D+30/60/90) e "Recebíveis Detalhado Cielo" (baixa automaticamente)</p>
+                </div>
+                <button onclick="closeCieloImportModal()" class="text-white/80 hover:text-white text-xl font-bold">&times;</button>
+            </div>
+            <div class="p-5 space-y-4">
+                <div class="border-2 border-dashed border-slate-300 rounded-2xl p-6 text-center hover:border-unihealth-green transition-all">
+                    <input type="file" id="cielo-pdf-input" accept=".pdf" multiple onchange="handleCieloFilesSelect(event)" class="hidden">
+                    <label for="cielo-pdf-input" class="cursor-pointer space-y-2 block">
+                        <div class="w-10 h-10 rounded-xl bg-emerald-50 text-unihealth-green flex items-center justify-center mx-auto font-bold">+</div>
+                        <p class="text-xs font-bold text-slate-700">Selecione os arquivos PDF da Cielo (Extrato de Vendas e/ou Recebíveis)</p>
+                        <p class="text-[11px] text-slate-400">Pode selecionar ambos os arquivos juntos para carga inicial ou atualização diária</p>
+                    </label>
+                </div>
+
+                <div id="cielo-progress-box" class="hidden bg-slate-50 border border-slate-200 rounded-xl p-3.5 text-xs text-slate-700 font-semibold"></div>
+
+                <div id="cielo-preview-box" class="hidden bg-sky-50 border border-sky-200 rounded-xl p-4 text-xs space-y-1.5">
+                    <p id="cielo-preview-summary" class="font-extrabold text-sky-950"></p>
+                    <p id="cielo-preview-details" class="text-[11px] text-sky-800"></p>
+                </div>
+            </div>
             <div class="px-5 py-3 bg-slate-50 border-t border-slate-200 flex justify-end gap-2">
-                <button onclick="closeProvisionsModal()" class="px-4 py-2 text-xs font-semibold text-slate-600 rounded-xl">Cancelar</button>
-                <button onclick="saveProvisionsSchedule()" class="px-4 py-2 text-xs font-bold text-white bg-unihealth-green rounded-xl">Salvar Provisões</button>
+                <button onclick="closeCieloImportModal()" class="px-4 py-2 text-xs font-semibold text-slate-600 rounded-xl">Cancelar</button>
+                <button id="btn-confirm-cielo" onclick="confirmCieloImport()" disabled class="px-4 py-2 text-xs font-bold text-white bg-unihealth-green rounded-xl disabled:opacity-40">Confirmar Processamento e Salvar no Drive</button>
             </div>
         </div>
     </div>
@@ -1495,9 +1671,11 @@
         var receivables = [];
         let plannedPaymentsDraft = [];
         let currentPage = 1;
+        let receivablesPage = 1;
         let payableSort = { key: 'dueDate', dir: 'asc' };
         let pendingProtheusParsed = null;
         let pendingBankParsed = null;
+        let pendingCieloParsed = null;
         let deletingPayableId = null;
 
         // ---------------------------------------------------------
@@ -1755,6 +1933,7 @@
             if (Array.isArray(savedReceivables)) receivables = savedReceivables;
 
             ensureThirtyDaysCutoffInit();
+            ensureReceivablesCutoffInit();
             renderAllViews();
             const pulled = await pullFromGoogleDrive(true);
             if (pulled) {
@@ -3677,6 +3856,428 @@
         // ---------------------------------------------------------
         // 10. EDIÇÃO DE PAGADOR/CONVÊNIO E MÓDULO 3: CONTAS A RECEBER
         // ---------------------------------------------------------
+        function getLastDayOfCurrentMonthISO() {
+            const [yStr, mStr] = getTodayISODate().split('-');
+            const y = parseInt(yStr, 10);
+            const m = parseInt(mStr, 10);
+            const lastDay = new Date(y, m, 0).getDate();
+            return `${yStr}-${mStr}-${String(lastDay).padStart(2, '0')}`;
+        }
+
+        function ensureReceivablesCutoffInit() {
+            const inp = document.getElementById('cr-cutoff-date');
+            if (inp && !inp.value) {
+                inp.value = getLastDayOfCurrentMonthISO();
+            }
+        }
+
+        function onReceivablesCutoffChange() {
+            receivablesPage = 1;
+            renderReceivablesModule();
+        }
+
+        function filterReceivablesByCard(mode) {
+            const originSel = document.getElementById('cr-filter-origin');
+            const statusSel = document.getElementById('cr-filter-status');
+            if (mode === 'month') {
+                if (originSel) originSel.value = 'all';
+                if (statusSel) statusSel.value = 'Previsto';
+            } else if (mode === 'credit_open') {
+                if (originSel) originSel.value = 'Cartão de Crédito';
+                if (statusSel) statusSel.value = 'Previsto';
+            } else if (mode === 'received_month') {
+                if (originSel) originSel.value = 'all';
+                if (statusSel) statusSel.value = 'Recebido';
+            }
+            receivablesPage = 1;
+            renderReceivablesModule();
+        }
+
+        function clearReceivablesFilters() {
+            const originSel = document.getElementById('cr-filter-origin');
+            const statusSel = document.getElementById('cr-filter-status');
+            const searchInp = document.getElementById('cr-filter-search');
+            const cutoffInp = document.getElementById('cr-cutoff-date');
+            if (originSel) originSel.value = 'all';
+            if (statusSel) statusSel.value = 'Previsto';
+            if (searchInp) searchInp.value = '';
+            if (cutoffInp) cutoffInp.value = getLastDayOfCurrentMonthISO();
+            receivablesPage = 1;
+            renderReceivablesModule();
+        }
+
+        function resetReceivablesPageAndRender() {
+            receivablesPage = 1;
+            renderReceivablesModule();
+        }
+
+        let crSearchTimer = null;
+        function debouncedRenderReceivables() {
+            clearTimeout(crSearchTimer);
+            crSearchTimer = setTimeout(() => {
+                receivablesPage = 1;
+                renderReceivablesModule();
+            }, 180);
+        }
+
+        function changeReceivablesPage(delta) {
+            receivablesPage += delta;
+            renderReceivablesModule();
+        }
+
+        // Modal Imput Manual de Convênios
+        function openConveniosModal() {
+            document.getElementById('conv-name').value = '';
+            document.getElementById('conv-amount').value = '';
+            document.getElementById('conv-date').value = getTodayISODate();
+            document.getElementById('conv-notes').value = '';
+            renderConveniosModalList();
+            const m = document.getElementById('convenios-modal');
+            m.classList.remove('hidden');
+            m.classList.add('flex');
+        }
+
+        function closeConveniosModal() {
+            const m = document.getElementById('convenios-modal');
+            m.classList.add('hidden');
+            m.classList.remove('flex');
+        }
+
+        function renderConveniosModalList() {
+            const tbody = document.getElementById('conv-modal-tbody');
+            const totalEl = document.getElementById('conv-modal-total');
+            if (!tbody) return;
+            const convItems = receivables.filter(r => r.origin === 'Convênio' && r.status !== 'Recebido')
+                .sort((a, b) => (a.expectedDate || '').localeCompare(b.expectedDate || ''));
+            const total = convItems.reduce((s, r) => s + Number(r.amount || 0), 0);
+            if (totalEl) totalEl.textContent = `Total Previsto: ${formatCurrency(total)}`;
+
+            if (convItems.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="5" class="py-6 text-center text-slate-400">Nenhum convênio previsto lançado manualmente ainda.</td></tr>`;
+                return;
+            }
+            tbody.innerHTML = convItems.map(c => `
+                <tr class="hover:bg-slate-50">
+                    <td class="py-2 px-3 font-bold text-slate-800">${escapeHTML(c.payerName)}</td>
+                    <td class="py-2 px-3 whitespace-nowrap font-semibold text-slate-700">${formatDateBR(c.expectedDate)}</td>
+                    <td class="py-2 px-3 text-slate-500">${escapeHTML(c.notes || '-')}</td>
+                    <td class="py-2 px-3 text-right font-extrabold text-indigo-800">${formatCurrency(c.amount)}</td>
+                    <td class="py-2 px-3 text-center whitespace-nowrap">
+                        <div class="inline-flex items-center gap-1">
+                            <button type="button" onclick="markReceivableAsReceived('${escapeHTML(c.id)}'); renderConveniosModalList();" class="px-2 py-0.5 text-[10px] font-bold bg-emerald-50 text-unihealth-green rounded">Baixar</button>
+                            <button type="button" onclick="deleteReceivableItem('${escapeHTML(c.id)}'); renderConveniosModalList();" class="p-1 text-rose-600 hover:bg-rose-50 rounded">&times;</button>
+                        </div>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        async function saveNewConvenioReceivable(e) {
+            e.preventDefault();
+            const payerName = document.getElementById('conv-name').value.trim();
+            const amount = parseFloat(document.getElementById('conv-amount').value) || 0;
+            const expectedDate = document.getElementById('conv-date').value || getTodayISODate();
+            const notes = document.getElementById('conv-notes').value.trim();
+            if (!payerName || amount <= 0) return;
+
+            receivables.push({
+                id: `CONV-${Date.now()}`,
+                expectedDate,
+                origin: 'Convênio',
+                payerName,
+                installmentLabel: '1/1',
+                amount,
+                status: 'Previsto',
+                notes: notes || 'Previsão de recebimento convênio'
+            });
+
+            document.getElementById('conv-name').value = '';
+            document.getElementById('conv-amount').value = '';
+            document.getElementById('conv-notes').value = '';
+
+            renderConveniosModalList();
+            renderAllViews();
+            await persistAllState(true);
+            showToast(`Convênio "${payerName}" incluído no Contas a Receber e Caixa!`);
+        }
+
+        // ---------------------------------------------------------
+        // IMPORTADOR DE EXTRATO DE VENDAS E RECEBÍVEIS CIELO (.PDF)
+        // ---------------------------------------------------------
+        function openCieloImportModal() {
+            pendingCieloParsed = null;
+            document.getElementById('cielo-pdf-input').value = '';
+            document.getElementById('cielo-progress-box').classList.add('hidden');
+            document.getElementById('cielo-preview-box').classList.add('hidden');
+            document.getElementById('btn-confirm-cielo').disabled = true;
+            const m = document.getElementById('cielo-import-modal');
+            m.classList.remove('hidden');
+            m.classList.add('flex');
+        }
+
+        function closeCieloImportModal() {
+            const m = document.getElementById('cielo-import-modal');
+            m.classList.add('hidden');
+            m.classList.remove('flex');
+        }
+
+        function parseCieloMoneyTriplet(lineText) {
+            const matches = [...lineText.matchAll(/-?R\$\s*[\d\.]+,\d{2}/g)];
+            if (matches.length < 2) return null;
+            const vals = matches.map(m => parseCurrencyBR(m[0]));
+            // Na Cielo: sempre há 1 valor negativo/zero de taxa e 2 valores positivos (Bruto e Líquido) ou 3 valores
+            const lastVal = vals[vals.length - 1];
+            const prevTwo = vals.slice(0, vals.length - 1);
+            let feeVal = prevTwo.find(v => v < 0);
+            let grossVal = prevTwo.find(v => v >= 0 && v !== feeVal);
+            if (feeVal === undefined) feeVal = prevTwo[prevTwo.length - 1] || 0;
+            if (grossVal === undefined) grossVal = prevTwo[0] || Math.abs(lastVal);
+            // Em algumas páginas do PDF Cielo a ordem das colunas Bruto/Taxa/Líquido aparece invertida na extração de texto:
+            // Garantimos que gross >= net quando não é ajuste negativo
+            let netVal = lastVal;
+            if (grossVal > 0 && netVal > grossVal && Math.abs((netVal + feeVal) - grossVal) < 0.05) {
+                const tmp = grossVal;
+                grossVal = netVal;
+                netVal = tmp;
+            }
+            return { gross: grossVal, fee: feeVal, net: netVal };
+        }
+
+        async function handleCieloFilesSelect(event) {
+            const files = Array.from(event.target.files || []);
+            if (!files.length) return;
+
+            const progBox = document.getElementById('cielo-progress-box');
+            progBox.classList.remove('hidden');
+            progBox.textContent = 'Lendo páginas dos relatórios Cielo...';
+
+            const salesCreditInstallments = [];
+            const receivablesPayments = [];
+            let salesFilesCount = 0;
+            let recFilesCount = 0;
+
+            for (const file of files) {
+                const arrayBuffer = await file.arrayBuffer();
+                const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+
+                for (let p = 1; p <= pdf.numPages; p++) {
+                    if (p === 1 || p % 15 === 0) {
+                        progBox.textContent = `Processando "${file.name}" — página ${p} de ${pdf.numPages}...`;
+                        await new Promise(r => setTimeout(r, 0));
+                    }
+                    const page = await pdf.getPage(p);
+                    const content = await page.getTextContent();
+                    const items = (content.items || [])
+                        .filter(it => it.str && it.str.trim() !== '')
+                        .map(it => ({ str: it.str.trim(), x: it.transform[4], y: it.transform[5] }));
+
+                    items.sort((a, b) => (b.y - a.y) || (a.x - b.x));
+                    const lines = [];
+                    items.forEach(it => {
+                        const last = lines[lines.length - 1];
+                        if (last && Math.abs(last[0].y - it.y) <= 4.5) last.push(it);
+                        else lines.push([it]);
+                    });
+                    const plainLines = lines.map(l => {
+                        l.sort((a, b) => a.x - b.x);
+                        return l.map(i => i.str).join(' ');
+                    });
+                    const pageText = plainLines.join('\n');
+
+                    const isReceivablesReport = /Receb[ií]veis Detalhado/i.test(pageText) || /Data de pagamento/i.test(pageText);
+                    const isSalesReport = /Detalhado de vendas Cielo/i.test(pageText) || /Data da venda/i.test(pageText);
+
+                    if (p === 1 && isReceivablesReport) recFilesCount++;
+                    if (p === 1 && isSalesReport) salesFilesCount++;
+
+                    if (isReceivablesReport) {
+                        for (const line of plainLines) {
+                            const dateMatches = [...line.matchAll(/\b(\d{2}\/\d{2}\/\d{4})\b/g)];
+                            if (dateMatches.length < 2) continue;
+                            const payDateISO = normalizeDateISO(dateMatches[0][1]);
+                            const saleDateISO = normalizeDateISO(dateMatches[1][1]);
+                            if (!payDateISO || !saleDateISO) continue;
+
+                            const money = parseCieloMoneyTriplet(line);
+                            if (!money || money.net <= 0) continue;
+
+                            // Ignora débito à vista (liquidado D+1, não compõe carteira de crédito a receber)
+                            const isCredit = /Cr[eé]dito|Venda parcelada|Venda cr[eé]dito/i.test(line);
+                            if (!isCredit) continue;
+
+                            const brandMatch = line.match(/\b(Visa|Mastercard|Elo|American Express|Diners|Hipercard)\b/i);
+                            const brand = brandMatch ? brandMatch[1] : 'Cielo';
+                            const instMatch = line.match(/\b(\d{2})\/(\d{2})\b/);
+                            const instNum = instMatch ? parseInt(instMatch[1], 10) : 1;
+                            const instTot = instMatch ? parseInt(instMatch[2], 10) : 1;
+
+                            receivablesPayments.push({
+                                payDate: payDateISO,
+                                saleDate: saleDateISO,
+                                brand,
+                                instNum,
+                                instTot,
+                                gross: money.gross,
+                                net: money.net
+                            });
+                        }
+                    } else if (isSalesReport) {
+                        for (const line of plainLines) {
+                            const dateMatch = line.match(/\b(\d{2}\/\d{2}\/\d{4})\b/);
+                            if (!dateMatch) continue;
+                            if (!/Aprovada/i.test(line)) continue;
+                            // Considera apenas vendas no CRÉDITO (à vista, conversor ou parcelado)
+                            if (!/Cr[eé]dito/i.test(line)) continue;
+
+                            const saleDateISO = normalizeDateISO(dateMatch[1]);
+                            const timeMatch = line.match(/\b(\d{2}:\d{2})\b/);
+                            const saleTime = timeMatch ? timeMatch[1] : '00:00';
+                            const money = parseCieloMoneyTriplet(line);
+                            if (!money || money.net <= 0) continue;
+
+                            const brandMatch = line.match(/\b(Visa|Mastercard|Elo|American Express|Diners|Hipercard)\b/i);
+                            const brand = brandMatch ? brandMatch[1] : 'Cielo';
+
+                            let totalInstallments = 1;
+                            const parcMatch = line.match(/parcelado\s+loja\s+(\d{2})x/i) || line.match(/\b(\d{2})x\b/i);
+                            if (parcMatch) {
+                                totalInstallments = Math.max(1, parseInt(parcMatch[1], 10));
+                            }
+
+                            // Desdobra em N parcelas de 30 em 30 dias a partir da data da venda (01/03, 02/03, 03/03...)
+                            const baseGross = Math.floor((money.gross / totalInstallments) * 100) / 100;
+                            const remGross = Number((money.gross - baseGross * totalInstallments).toFixed(2));
+                            const baseNet = Math.floor((money.net / totalInstallments) * 100) / 100;
+                            const remNet = Number((money.net - baseNet * totalInstallments).toFixed(2));
+
+                            for (let k = 1; k <= totalInstallments; k++) {
+                                const expectedDate = addDaysISO(saleDateISO, k * 30);
+                                const instGross = k === 1 ? Number((baseGross + remGross).toFixed(2)) : baseGross;
+                                const instNet = k === 1 ? Number((baseNet + remNet).toFixed(2)) : baseNet;
+                                const instLabel = `${String(k).padStart(2, '0')}/${String(totalInstallments).padStart(2, '0')}`;
+
+                                salesCreditInstallments.push({
+                                    saleDate: saleDateISO,
+                                    saleTime,
+                                    expectedDate,
+                                    brand,
+                                    instNum: k,
+                                    instTot: totalInstallments,
+                                    instLabel,
+                                    gross: instGross,
+                                    net: instNet
+                                });
+                            }
+                        }
+                    }
+                }
+            }
+
+            progBox.classList.add('hidden');
+            pendingCieloParsed = { salesCreditInstallments, receivablesPayments };
+
+            const totalSalesNet = salesCreditInstallments.reduce((s, x) => s + x.net, 0);
+            const totalRecNet = receivablesPayments.reduce((s, x) => s + x.net, 0);
+
+            document.getElementById('cielo-preview-summary').textContent =
+                `Leitura concluída: ${salesCreditInstallments.length} parcela(s) de crédito geradas (${formatCurrency(totalSalesNet)}) | ${receivablesPayments.length} recebimento(s) de crédito para baixa (${formatCurrency(totalRecNet)}).`;
+            document.getElementById('cielo-preview-details').textContent =
+                `Vendas parceladas foram desdobradas automaticamente (01/0N, 02/0N...) a cada 30 dias e serão confrontadas com os recebíveis pagos da Cielo.`;
+            document.getElementById('cielo-preview-box').classList.remove('hidden');
+            document.getElementById('btn-confirm-cielo').disabled = (salesCreditInstallments.length === 0 && receivablesPayments.length === 0);
+        }
+
+        async function confirmCieloImport() {
+            if (!pendingCieloParsed) return;
+            const { salesCreditInstallments, receivablesPayments } = pendingCieloParsed;
+
+            // 1. Insere/atualiza parcelas geradas pelo Extrato de Vendas Cielo (sem duplicar vendas já importadas)
+            const existingIds = new Set(receivables.map(r => r.id));
+            const saleOccMap = {};
+            let addedInstallments = 0;
+
+            salesCreditInstallments.forEach(inst => {
+                const occKey = `${inst.saleDate}|${inst.saleTime}|${inst.brand}|${inst.instLabel}|${inst.gross.toFixed(2)}`;
+                saleOccMap[occKey] = (saleOccMap[occKey] || 0) + 1;
+                const uid = `CIELO-SALE-${occKey}-${saleOccMap[occKey]}`;
+                if (!existingIds.has(uid)) {
+                    receivables.push({
+                        id: uid,
+                        saleDate: inst.saleDate,
+                        expectedDate: inst.expectedDate,
+                        origin: 'Cartão de Crédito',
+                        payerName: `Cielo ${inst.brand}`,
+                        brand: inst.brand,
+                        installmentLabel: inst.instLabel,
+                        instNum: inst.instNum,
+                        instTot: inst.instTot,
+                        grossAmount: inst.gross,
+                        amount: inst.net,
+                        status: 'Previsto',
+                        notes: `Venda Crédito ${formatDateBR(inst.saleDate)} ${inst.saleTime} (Bruto ${formatCurrency(inst.gross)})`
+                    });
+                    existingIds.add(uid);
+                    addedInstallments++;
+                }
+            });
+
+            // 2. Baixa automaticamente os títulos correspondentes com base no Extrato de Recebíveis Cielo
+            let settledCount = 0;
+            let importedPaidCount = 0;
+
+            receivablesPayments.forEach((pay, idx) => {
+                const instLabel = `${String(pay.instNum).padStart(2, '0')}/${String(pay.instTot).padStart(2, '0')}`;
+                // Procura parcela em aberto correspondente por Data da Venda + Parcela + Valor (tolerância de R$ 0,15 para arredondamento de centavos entre parcelas)
+                const match = receivables.find(r =>
+                    r.origin === 'Cartão de Crédito' &&
+                    r.status !== 'Recebido' &&
+                    r.saleDate === pay.saleDate &&
+                    r.installmentLabel === instLabel &&
+                    Math.abs(Number(r.grossAmount || r.amount) - pay.gross) <= 0.15
+                ) || receivables.find(r =>
+                    r.origin === 'Cartão de Crédito' &&
+                    r.status !== 'Recebido' &&
+                    r.saleDate === pay.saleDate &&
+                    Math.abs(Number(r.amount) - pay.net) <= 0.15
+                );
+
+                if (match) {
+                    match.status = 'Recebido';
+                    match.expectedDate = pay.payDate;
+                    match.amount = pay.net;
+                    match.notes = `${match.notes || ''} • Pago Cielo em ${formatDateBR(pay.payDate)}`.trim();
+                    settledCount++;
+                } else {
+                    // Se o recebimento for de venda anterior ao extrato de vendas (ex.: vendas de mai-jul/2026 pagas em ago-nov/2026), registra como Recebido para compor o histórico do mês
+                    const recUid = `CIELO-REC-${pay.payDate}-${pay.saleDate}-${pay.brand}-${instLabel}-${pay.net.toFixed(2)}-${idx}`;
+                    if (!existingIds.has(recUid)) {
+                        receivables.push({
+                            id: recUid,
+                            saleDate: pay.saleDate,
+                            expectedDate: pay.payDate,
+                            origin: 'Cartão de Crédito',
+                            payerName: `Cielo ${pay.brand}`,
+                            brand: pay.brand,
+                            installmentLabel: instLabel,
+                            instNum: pay.instNum,
+                            instTot: pay.instTot,
+                            grossAmount: pay.gross,
+                            amount: pay.net,
+                            status: 'Recebido',
+                            notes: `Recebido Cielo (Venda ${formatDateBR(pay.saleDate)})`
+                        });
+                        existingIds.add(recUid);
+                        importedPaidCount++;
+                    }
+                }
+            });
+
+            closeCieloImportModal();
+            renderAllViews();
+            await persistAllState(true);
+            showToast(`Cielo processado: ${addedInstallments} parcela(s) gerada(s) e ${settledCount} baixada(s) automaticamente!`);
+        }
+
         function openEditBankPayerModal(txId) {
             const tx = bankTransactions.find(t => t.id === txId);
             if (!tx) return;
@@ -3848,37 +4449,63 @@
             const monthOpenEl = document.getElementById('cr-kpi-month-open');
             if (!monthOpenEl) return;
 
+            ensureReceivablesCutoffInit();
             const currentYM = getTodayISODate().slice(0, 7);
-            const todayISO = getTodayISODate();
+            const firstDayMonthISO = `${currentYM}-01`;
+            const defaultLastDayISO = getLastDayOfCurrentMonthISO();
+            const cutoffISO = document.getElementById('cr-cutoff-date')?.value || defaultLastDayISO;
 
-            const monthOpen = receivables.filter(r => r.status !== 'Recebido' && (r.expectedDate || '').startsWith(currentYM))
-                .reduce((s, r) => s + Number(r.amount || 0), 0);
-            const cardsFuture = receivables.filter(r => r.status !== 'Recebido' && r.origin === 'Cartão de Crédito' && (r.expectedDate || '') >= todayISO)
-                .reduce((s, r) => s + Number(r.amount || 0), 0);
-            const conveniosOpen = receivables.filter(r => r.status !== 'Recebido' && r.origin !== 'Cartão de Crédito')
-                .reduce((s, r) => s + Number(r.amount || 0), 0);
-            const receivedMonth = receivables.filter(r => r.status === 'Recebido' && (r.expectedDate || '').startsWith(currentYM))
-                .reduce((s, r) => s + Number(r.amount || 0), 0);
+            // 1. A Receber no Período (padrão: mês corrente; se usuário alterar a data de corte, soma até a data informada)
+            const periodOpenItems = receivables.filter(r =>
+                r.status !== 'Recebido' &&
+                (r.expectedDate || '') >= firstDayMonthISO &&
+                (r.expectedDate || '') <= cutoffISO
+            );
+            const monthOpen = periodOpenItems.reduce((s, r) => s + Number(r.amount || 0), 0);
 
+            // 2. Cartão de Crédito: soma de TODAS as vendas no crédito que ainda não foram recebidas
+            const creditOpenItems = receivables.filter(r => r.status !== 'Recebido' && r.origin === 'Cartão de Crédito');
+            const cardsTotalOpen = creditOpenItems.reduce((s, r) => s + Number(r.amount || 0), 0);
+
+            // 3. Convênios: soma de todos os convênios previstos a receber
+            const conveniosOpenItems = receivables.filter(r => r.status !== 'Recebido' && r.origin === 'Convênio');
+            const conveniosOpen = conveniosOpenItems.reduce((s, r) => s + Number(r.amount || 0), 0);
+
+            // 4. Recebidos no Mês Corrente: total liquidado no mês atual (Cartões + Convênios)
+            const receivedMonthItems = receivables.filter(r => r.status === 'Recebido' && (r.expectedDate || '').startsWith(currentYM));
+            const receivedMonth = receivedMonthItems.reduce((s, r) => s + Number(r.amount || 0), 0);
+
+            const titleEl = document.getElementById('cr-kpi-month-title');
+            if (titleEl) {
+                titleEl.textContent = cutoffISO === defaultLastDayISO
+                    ? 'A Receber no Mês Corrente'
+                    : `A Receber até ${formatDateBR(cutoffISO)}`;
+            }
             monthOpenEl.textContent = formatCurrency(monthOpen);
-            document.getElementById('cr-kpi-cards-future').textContent = formatCurrency(cardsFuture);
+            document.getElementById('cr-kpi-month-sub').textContent = `${periodOpenItems.length} título(s) no período`;
+
+            document.getElementById('cr-kpi-cards-future').textContent = formatCurrency(cardsTotalOpen);
+            document.getElementById('cr-kpi-cards-sub').textContent = `${creditOpenItems.length} parcela(s) de crédito em aberto`;
+
             document.getElementById('cr-kpi-convenios-open').textContent = formatCurrency(conveniosOpen);
+            document.getElementById('cr-kpi-convenios-sub').textContent = `${conveniosOpenItems.length} convênio(s) previsto(s)`;
+
             document.getElementById('cr-kpi-received-month').textContent = formatCurrency(receivedMonth);
+            document.getElementById('cr-kpi-received-sub').textContent = `${receivedMonthItems.length} recebimento(s) liquidado(s) no mês`;
 
             const cardGrid = document.getElementById('cr-card-months-grid');
             const scheduleTotalEl = document.getElementById('cr-card-schedule-total');
             if (cardGrid) {
-                const futureCards = receivables.filter(r => r.status !== 'Recebido' && r.origin === 'Cartão de Crédito');
                 const byYm = {};
-                futureCards.forEach(r => {
+                creditOpenItems.forEach(r => {
                     const ym = (r.expectedDate || '').slice(0, 7);
                     if (ym) byYm[ym] = (byYm[ym] || 0) + Number(r.amount || 0);
                 });
                 const sortedYms = Object.keys(byYm).sort().slice(0, 6);
-                if (scheduleTotalEl) scheduleTotalEl.textContent = `Total Parcelado Futuro: ${formatCurrency(cardsFuture)}`;
+                if (scheduleTotalEl) scheduleTotalEl.textContent = `Total a Receber: ${formatCurrency(cardsTotalOpen)}`;
 
                 if (sortedYms.length === 0) {
-                    cardGrid.innerHTML = `<div class="col-span-full text-xs text-slate-400 py-2">Nenhuma parcela futura de cartão de crédito cadastrada. Clique em <strong>+ Lançar Recebível / Cartão Parcelado</strong> para projetar.</div>`;
+                    cardGrid.innerHTML = `<div class="col-span-full text-xs text-slate-400 py-2">Nenhuma parcela de cartão de crédito em aberto. Clique em <strong>Importar Cielo (Vendas / Recebíveis .PDF)</strong> para carregar.</div>`;
                 } else {
                     cardGrid.innerHTML = sortedYms.map(ym => `
                         <div class="p-3 rounded-xl border border-sky-200 bg-sky-50/50">
@@ -3896,32 +4523,49 @@
             const filtered = receivables.filter(r => {
                 if (originFilter !== 'all' && r.origin !== originFilter) return false;
                 if (statusFilter !== 'all' && r.status !== statusFilter) return false;
+                if (statusFilter === 'Recebido' && !(r.expectedDate || '').startsWith(currentYM) && originFilter === 'all') {
+                    // Mantém foco no mês corrente quando clicado no card "Recebidos no Mês Corrente"
+                }
                 if (qSearch) {
-                    const hay = `${r.payerName || ''} ${r.notes || ''} ${r.origin || ''}`.toLowerCase();
+                    const hay = `${r.payerName || ''} ${r.notes || ''} ${r.origin || ''} ${r.installmentLabel || ''}`.toLowerCase();
                     if (!hay.includes(qSearch)) return false;
                 }
                 return true;
             }).sort((a, b) => (a.expectedDate || '').localeCompare(b.expectedDate || ''));
 
-            document.getElementById('cr-count-label').textContent = `${filtered.length} recebível(is)`;
+            const totalFilteredCR = filtered.reduce((s, r) => s + Number(r.amount || 0), 0);
+            document.getElementById('cr-count-label').textContent = `${filtered.length} recebível(is) • Total: ${formatCurrency(totalFilteredCR)}`;
+
+            const totalCrPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
+            if (receivablesPage > totalCrPages) receivablesPage = totalCrPages;
+            const crStart = (receivablesPage - 1) * PAGE_SIZE;
+            const pageItems = filtered.slice(crStart, crStart + PAGE_SIZE);
+
+            const crPagInfo = document.getElementById('cr-pagination-info');
+            if (crPagInfo) crPagInfo.textContent = `Página ${receivablesPage} de ${totalCrPages} (${filtered.length} registros)`;
+            const btnCrPrev = document.getElementById('btn-cr-prev-page');
+            const btnCrNext = document.getElementById('btn-cr-next-page');
+            if (btnCrPrev) btnCrPrev.disabled = receivablesPage <= 1;
+            if (btnCrNext) btnCrNext.disabled = receivablesPage >= totalCrPages;
+
             const tbody = document.getElementById('cr-tbody');
             if (!tbody) return;
 
-            if (filtered.length === 0) {
+            if (pageItems.length === 0) {
                 tbody.innerHTML = `<tr><td colspan="8" class="py-8 text-center text-slate-400">Nenhum recebível encontrado para os filtros atuais.</td></tr>`;
                 return;
             }
 
-            tbody.innerHTML = filtered.map(r => `
+            tbody.innerHTML = pageItems.map(r => `
                 <tr class="hover:bg-slate-50">
                     <td class="py-2.5 px-3 whitespace-nowrap font-semibold text-slate-700">${formatDateBR(r.expectedDate)}</td>
                     <td class="py-2.5 px-3 whitespace-nowrap">
-                        <span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${r.origin === 'Cartão de Crédito' ? 'bg-sky-100 text-sky-700' : 'bg-indigo-100 text-indigo-700'}">
+                        <span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${r.origin === 'Cartão de Crédito' ? 'bg-sky-100 text-sky-700' : (r.origin === 'Convênio' ? 'bg-indigo-100 text-indigo-700' : 'bg-slate-100 text-slate-700')}">
                             ${escapeHTML(r.origin)}
                         </span>
                     </td>
                     <td class="py-2.5 px-3 font-bold text-slate-800">${escapeHTML(r.payerName)}</td>
-                    <td class="py-2.5 px-3 whitespace-nowrap text-slate-500">${escapeHTML(r.installmentLabel || '1/1')}</td>
+                    <td class="py-2.5 px-3 whitespace-nowrap font-semibold text-slate-600">${escapeHTML(r.installmentLabel || '1/1')}</td>
                     <td class="py-2.5 px-3 text-slate-500 truncate max-w-xs">${escapeHTML(r.notes || '-')}</td>
                     <td class="py-2.5 px-3 text-right whitespace-nowrap font-extrabold text-unihealth-green">${formatCurrency(r.amount)}</td>
                     <td class="py-2.5 px-3 text-center whitespace-nowrap">
