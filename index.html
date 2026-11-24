@@ -1233,7 +1233,11 @@
             <div class="p-5 space-y-3 text-xs">
                 <div>
                     <label class="block font-bold text-slate-600 mb-1">URL do Web App (DB_Unihealth)</label>
-                    <input type="url" id="gdrive-url-input" class="w-full px-3 py-2 border border-slate-200 rounded-xl font-mono text-[11px]">
+                    <div class="flex gap-1.5">
+                        <input type="url" id="gdrive-url-input" class="flex-1 px-3 py-2 border border-slate-200 rounded-xl font-mono text-[11px]">
+                        <button type="button" onclick="copyCurrentGDriveUrl()" class="px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl whitespace-nowrap">Copiar URL</button>
+                    </div>
+                    <p class="text-[10px] text-slate-400 mt-1">Para funcionar em guia anônima e para toda a equipe no GitHub, esta URL deve estar colada na constante <code>DEFAULT_GDRIVE_WEBAPP_URL</code> do arquivo <code>index.html</code>.</p>
                 </div>
                 <div>
                     <label class="block font-bold text-slate-600 mb-1">Senha Administrativa</label>
@@ -1281,7 +1285,10 @@
             pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
         }
 
-        const DEFAULT_GDRIVE_WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbxS6xF9G_wY4L7m8n9p0q1r2s3t4u5v6w7x8y9z0A1B2C3D4E5F/exec';
+        // =========================================================================
+        // COLE AQUI A SUA URL REAL DO GOOGLE APPS SCRIPT ANTES DE SUBIR NO GITHUB:
+        // =========================================================================
+        const DEFAULT_GDRIVE_WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbxeZJ2iLZcTZRbq0QkXVXbtFFxxrXu8vZiOScziBNX4wZyC_DKq2bDhFPQEyMzqPi_MRg/exec';
         const GDRIVE_URL_KEY = 'unihealth_gdrive_webapp_url';
         const LOCAL_UPDATED_AT_KEY = 'unihealth_local_updated_at';
         const PAGE_SIZE = 50;
@@ -1549,6 +1556,18 @@
             return localStorage.getItem(GDRIVE_URL_KEY) || DEFAULT_GDRIVE_WEBAPP_URL;
         }
 
+        function isPlaceholderDriveUrl(url) {
+            return !url || url.includes('AKfycbxS6xF9G_wY4L7m8n9p0q1r2s3t4u5v6w7x8y9z0A1B2C3D4E5F');
+        }
+
+        function copyCurrentGDriveUrl() {
+            const inp = document.getElementById('gdrive-url-input');
+            if (!inp) return;
+            inp.select();
+            document.execCommand('copy');
+            showToast('URL do Google Drive copiada!');
+        }
+
         function updateCloudStatusBadge(ok, text) {
             const dot = document.getElementById('cloud-status-dot');
             const lbl = document.getElementById('cloud-status-text');
@@ -1561,7 +1580,10 @@
 
         async function pushToGoogleDrive(silent = true) {
             const url = getGDriveUrl();
-            if (!url) return false;
+            if (isPlaceholderDriveUrl(url)) {
+                updateCloudStatusBadge(false, 'URL Drive não fixada');
+                return false;
+            }
             if (isDrivePushInFlight) {
                 hasQueuedDrivePush = true;
                 return false;
@@ -1608,7 +1630,10 @@
 
         async function pullFromGoogleDrive(silent = true) {
             const url = getGDriveUrl();
-            if (!url) return false;
+            if (isPlaceholderDriveUrl(url)) {
+                updateCloudStatusBadge(false, 'URL Drive não fixada');
+                return false;
+            }
             try {
                 const res = await fetch(`${url}?t=${Date.now()}`);
                 if (!res.ok) return false;
@@ -1616,7 +1641,7 @@
                 if (json && json.ok && json.data) {
                     const remoteData = json.data;
                     const localUpdated = localStorage.getItem(LOCAL_UPDATED_AT_KEY) || '';
-                    if (remoteData.updatedAt && remoteData.updatedAt >= localUpdated) {
+                    if (!localUpdated || (remoteData.updatedAt && remoteData.updatedAt >= localUpdated)) {
                         if (Array.isArray(remoteData.payables) && remoteData.payables.length > 0) {
                             payables = remoteData.payables;
                             await saveToIndexedDB('payables_list', payables);
