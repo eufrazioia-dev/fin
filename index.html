@@ -67,14 +67,14 @@
     <!-- ========================================================= -->
     <!-- 2. APLICAÇÃO PRINCIPAL (SIDEBAR FIXA + ÁREA CENTRAL)      -->
     <!-- ========================================================= -->
-    <div id="app-shell" class="hidden min-h-screen flex flex-col lg:flex-row">
+    <div id="app-shell" class="hidden min-h-screen w-full flex flex-col lg:flex-row">
 
-        <!-- BARRA LATERAL ESQUERDA FIXA -->
-        <aside class="w-full lg:w-64 bg-white border-b lg:border-b-0 lg:border-r border-slate-200 flex flex-col justify-between shrink-0">
+        <!-- BARRA LATERAL ESQUERDA RECOLHÍVEL -->
+        <aside id="app-sidebar" class="w-full lg:w-64 bg-white border-b lg:border-b-0 lg:border-r border-slate-200 flex flex-col justify-between shrink-0 transition-all duration-200">
             <div>
-                <!-- Topo Verde com Logo Oficial -->
-                <div class="bg-[#013A19] px-4 py-4 flex items-center justify-center">
-                    <svg viewBox="0 0 360 112" preserveAspectRatio="xMidYMid meet" class="w-full max-w-[225px] h-auto mx-auto" xmlns="http://www.w3.org/2000/svg">
+                <!-- Topo Verde com Logo Oficial + Botão Recolher -->
+                <div id="sidebar-logo-header" class="bg-[#013A19] px-3 py-3.5 flex items-center justify-between gap-2">
+                    <svg id="sidebar-logo-full" viewBox="0 0 360 112" preserveAspectRatio="xMidYMid meet" class="w-full max-w-[195px] h-auto" xmlns="http://www.w3.org/2000/svg">
                         <rect x="8" y="18" width="292" height="76" rx="10" fill="#013A19"/>
                         <text x="18" y="70" fill="#FFFFFF" font-family="Inter, sans-serif" font-weight="800" font-size="47" letter-spacing="-1.2">Unihealth</text>
                         <text x="148" y="86" fill="#FFFFFF" font-family="Inter, sans-serif" font-weight="600" font-size="14" letter-spacing="-0.2">Gestão Hospitalar</text>
@@ -82,86 +82,116 @@
                         <polygon points="323,14 323,94 275,94 301,64 280,64" fill="#FFFFFF" stroke="#F47920" stroke-width="1.8" stroke-linejoin="round"/>
                         <polygon points="325,24 325,90 284,90 309,61 289,61" fill="#013A19"/>
                     </svg>
+                    <svg id="sidebar-logo-mini" viewBox="0 0 64 64" class="hidden w-8 h-8 mx-auto shrink-0" xmlns="http://www.w3.org/2000/svg">
+                        <polygon points="52,6 52,58 14,58 32,38 17,38" fill="#F47920"/>
+                        <polygon points="44,8 44,58 10,58 28,36 13,36" fill="#FFFFFF" stroke="#F47920" stroke-width="1.5" stroke-linejoin="round"/>
+                        <polygon points="45,15 45,54 16,54 33,34 19,34" fill="#013A19"/>
+                    </svg>
+                    <button type="button" onclick="toggleSidebarCollapse()" id="btn-toggle-sidebar" title="Recolher menu lateral" class="hidden lg:flex items-center justify-center w-7 h-7 rounded-lg bg-white/10 hover:bg-white/20 text-white shrink-0 transition-all">
+                        <svg id="sidebar-collapse-icon" class="w-4 h-4 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 19l-7-7 7-7m8 14l-7-7 7-7"/></svg>
+                    </button>
                 </div>
 
                 <!-- Navegação de Módulos -->
-                <nav class="p-3 space-y-1">
-                    <div class="px-3 pt-2 pb-1 text-[10px] font-bold uppercase tracking-wider text-slate-400">Módulos Financeiros</div>
+                <nav class="p-2.5 space-y-1">
+                    <div class="sidebar-section-title px-3 pt-2 pb-1 text-[10px] font-bold uppercase tracking-wider text-slate-400">Módulos Financeiros</div>
 
-                    <button id="nav-payables" onclick="switchModule('payables')" class="w-full flex items-center justify-between px-3 py-2.5 text-sm font-bold rounded-xl text-left bg-emerald-50 text-unihealth-green transition-all">
-                        <span class="flex items-center gap-2.5">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-                            <span>1. Contas a Pagar</span>
+                    <button id="nav-payables" onclick="switchModule('payables')" title="1. Contas a Pagar (SE2)" class="w-full flex items-center justify-between px-3 py-2.5 text-sm font-bold rounded-xl text-left bg-emerald-50 text-unihealth-green transition-all">
+                        <span class="flex items-center gap-2.5 min-w-0">
+                            <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                            <span class="sidebar-label truncate">1. Contas a Pagar</span>
                         </span>
-                        <span class="text-[10px] font-bold bg-emerald-100 text-emerald-800 px-1.5 py-0.5 rounded">SE2</span>
+                        <span class="sidebar-badge text-[10px] font-bold bg-emerald-100 text-emerald-800 px-1.5 py-0.5 rounded">SE2</span>
                     </button>
 
-                    <button id="nav-reconciliation" onclick="switchModule('reconciliation')" class="w-full flex items-center justify-between px-3 py-2.5 text-sm rounded-xl text-left text-slate-600 hover:bg-slate-50 transition-all">
-                        <span class="flex items-center gap-2.5">
-                            <svg class="w-4 h-4 text-sky-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/></svg>
-                            <span>2. Conciliação &amp; Caixa</span>
+                    <button id="nav-reconciliation" onclick="switchModule('reconciliation')" title="2. Conciliação & Caixa" class="w-full flex items-center justify-between px-3 py-2.5 text-sm rounded-xl text-left text-slate-600 hover:bg-slate-50 transition-all">
+                        <span class="flex items-center gap-2.5 min-w-0">
+                            <svg class="w-4 h-4 text-sky-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/></svg>
+                            <span class="sidebar-label truncate">2. Conciliação &amp; Caixa</span>
                         </span>
-                        <span class="text-[10px] font-bold bg-sky-100 text-sky-800 px-1.5 py-0.5 rounded">Ativo</span>
+                        <span class="sidebar-badge text-[10px] font-bold bg-sky-100 text-sky-800 px-1.5 py-0.5 rounded">Ativo</span>
                     </button>
 
-                    <button id="nav-receivables" onclick="switchModule('receivables')" class="w-full flex items-center justify-between px-3 py-2.5 text-sm rounded-xl text-left text-slate-600 hover:bg-slate-50 transition-all">
-                        <span class="flex items-center gap-2.5">
-                            <svg class="w-4 h-4 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                            <span>3. Contas a Receber</span>
+                    <button id="nav-receivables" onclick="switchModule('receivables')" title="3. Contas a Receber" class="w-full flex items-center justify-between px-3 py-2.5 text-sm rounded-xl text-left text-slate-600 hover:bg-slate-50 transition-all">
+                        <span class="flex items-center gap-2.5 min-w-0">
+                            <svg class="w-4 h-4 text-emerald-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                            <span class="sidebar-label truncate">3. Contas a Receber</span>
                         </span>
-                        <span class="text-[10px] font-bold bg-emerald-100 text-emerald-800 px-1.5 py-0.5 rounded">Ativo</span>
+                        <span class="sidebar-badge text-[10px] font-bold bg-emerald-100 text-emerald-800 px-1.5 py-0.5 rounded">Ativo</span>
                     </button>
 
-                    <button id="nav-cashflow" onclick="switchModule('cashflow')" class="w-full flex items-center justify-between px-3 py-2.5 text-sm rounded-xl text-left text-slate-600 hover:bg-slate-50 transition-all">
-                        <span class="flex items-center gap-2.5">
-                            <svg class="w-4 h-4 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z"/></svg>
-                            <span>4. Fluxo de Caixa</span>
+                    <button id="nav-cashflow" onclick="switchModule('cashflow')" title="4. Fluxo de Caixa" class="w-full flex items-center justify-between px-3 py-2.5 text-sm rounded-xl text-left text-slate-600 hover:bg-slate-50 transition-all">
+                        <span class="flex items-center gap-2.5 min-w-0">
+                            <svg class="w-4 h-4 text-amber-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z"/></svg>
+                            <span class="sidebar-label truncate">4. Fluxo de Caixa</span>
                         </span>
-                        <span class="text-[10px] font-bold bg-amber-100 text-amber-800 px-1.5 py-0.5 rounded">Livre</span>
+                        <span class="sidebar-badge text-[10px] font-bold bg-amber-100 text-amber-800 px-1.5 py-0.5 rounded">Livre</span>
                     </button>
 
-                    <div class="px-3 pt-4 pb-1 text-[10px] font-bold uppercase tracking-wider text-slate-400">Governança &amp; Dados</div>
-
-                    <button onclick="openSettingsModal()" class="w-full flex items-center gap-2.5 px-3 py-2 text-xs font-medium text-slate-600 hover:bg-slate-50 rounded-xl text-left">
-                        <svg class="w-4 h-4 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-                        <span>Ajustes (Fornecedores / Tipos)</span>
+                    <button id="nav-debit-notes" onclick="switchModule('debit-notes')" title="5. Notas de Débito" class="w-full flex items-center justify-between px-3 py-2.5 text-sm rounded-xl text-left text-slate-600 hover:bg-slate-50 transition-all">
+                        <span class="flex items-center gap-2.5 min-w-0">
+                            <svg class="w-4 h-4 text-violet-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 14l6-6m-5.5.5h.01m4.99 5h.01M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16l3.5-2 3.5 2 3.5-2 3.5 2z"/></svg>
+                            <span class="sidebar-label truncate">5. Notas de Débito</span>
+                        </span>
+                        <span class="sidebar-badge text-[10px] font-bold bg-violet-100 text-violet-800 px-1.5 py-0.5 rounded">ND</span>
                     </button>
 
-                    <button onclick="openDbCleanupModal()" class="w-full flex items-center gap-2.5 px-3 py-2 text-xs font-medium text-slate-600 hover:bg-slate-50 rounded-xl text-left">
-                        <svg class="w-4 h-4 text-rose-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
-                        <span>Manutenção &amp; Limpeza</span>
+                    <button id="nav-account-settlement" onclick="switchModule('account-settlement')" title="6. Encontro de Contas 2026" class="w-full flex items-center justify-between px-3 py-2.5 text-sm rounded-xl text-left text-slate-600 hover:bg-slate-50 transition-all">
+                        <span class="flex items-center gap-2.5 min-w-0">
+                            <svg class="w-4 h-4 text-emerald-700 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                            <span class="sidebar-label truncate">6. Encontro de Contas</span>
+                        </span>
+                        <span class="sidebar-badge text-[10px] font-bold bg-emerald-100 text-emerald-800 px-1.5 py-0.5 rounded">2026</span>
+                    </button>
+
+                    <div class="sidebar-section-title px-3 pt-4 pb-1 text-[10px] font-bold uppercase tracking-wider text-slate-400">Governança &amp; Dados</div>
+
+                    <button onclick="openSettingsModal()" title="Ajustes (Fornecedores / Tipos)" class="w-full flex items-center gap-2.5 px-3 py-2 text-xs font-medium text-slate-600 hover:bg-slate-50 rounded-xl text-left">
+                        <svg class="w-4 h-4 text-slate-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                        <span class="sidebar-label truncate">Ajustes (Fornecedores / Tipos)</span>
+                    </button>
+
+                    <button onclick="openDbCleanupModal()" title="Manutenção & Limpeza" class="w-full flex items-center gap-2.5 px-3 py-2 text-xs font-medium text-slate-600 hover:bg-slate-50 rounded-xl text-left">
+                        <svg class="w-4 h-4 text-rose-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                        <span class="sidebar-label truncate">Manutenção &amp; Limpeza</span>
                     </button>
                 </nav>
             </div>
 
             <!-- Rodapé Sidebar: Status Google Drive + Sair -->
-            <div class="p-3 border-t border-slate-200 space-y-2">
-                <button onclick="openGDriveModal()" class="w-full flex items-center justify-between px-3 py-2 bg-slate-50 hover:bg-emerald-50 border border-slate-200 rounded-xl text-left transition-all">
-                    <div class="flex items-center gap-2">
-                        <span id="cloud-status-dot" class="w-2 h-2 rounded-full bg-emerald-500"></span>
-                        <div>
+            <div class="p-2.5 border-t border-slate-200 space-y-2">
+                <button onclick="openGDriveModal()" title="Google Drive Sync" class="w-full flex items-center justify-between px-3 py-2 bg-slate-50 hover:bg-emerald-50 border border-slate-200 rounded-xl text-left transition-all">
+                    <div class="flex items-center gap-2 min-w-0">
+                        <span id="cloud-status-dot" class="w-2.5 h-2.5 rounded-full bg-emerald-500 shrink-0"></span>
+                        <div class="sidebar-label truncate">
                             <div class="text-[11px] font-bold text-slate-700">Google Drive Sync</div>
                             <div id="cloud-status-text" class="text-[10px] text-slate-500">Conectado (DB_Unihealth)</div>
                         </div>
                     </div>
-                    <span class="text-[10px] font-bold text-unihealth-green">Config</span>
+                    <span class="sidebar-badge text-[10px] font-bold text-unihealth-green">Config</span>
                 </button>
-                <button onclick="handleLogout()" class="w-full py-2 text-xs font-semibold text-slate-500 hover:text-rose-600 hover:bg-rose-50 rounded-xl transition-all">
-                    Sair do Portal
+                <button onclick="handleLogout()" title="Sair do Portal" class="w-full py-2 flex items-center justify-center gap-1.5 text-xs font-semibold text-slate-500 hover:text-rose-600 hover:bg-rose-50 rounded-xl transition-all">
+                    <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+                    <span class="sidebar-label">Sair do Portal</span>
                 </button>
             </div>
         </aside>
 
-        <!-- ÁREA PRINCIPAL -->
-        <div class="flex-1 flex flex-col min-w-0">
+        <!-- ÁREA PRINCIPAL (CABEÇALHO NO TOPO + MÓDULOS ABAIXO) -->
+        <div class="flex-1 flex flex-col min-w-0 w-full">
             <!-- Cabeçalho Superior -->
-            <header class="bg-white border-b border-slate-200 px-4 sm:px-6 py-3.5 flex items-center justify-between gap-4">
-                <div>
-                    <h1 id="header-module-title" class="text-base sm:text-lg font-extrabold text-slate-800">Contas a Pagar — TOTVS Protheus (SE2)</h1>
-                    <p id="header-module-subtitle" class="text-xs text-slate-500">Hospital Unihealth Governador Valadares • Gestão ICDS</p>
+            <header class="w-full bg-white border-b border-slate-200 px-4 sm:px-6 py-3 flex items-center justify-between gap-4 shrink-0">
+                <div class="flex items-center gap-3 min-w-0">
+                    <button type="button" onclick="toggleSidebarCollapse()" title="Recolher / Expandir menu lateral" class="hidden lg:inline-flex items-center justify-center p-2 rounded-xl border border-slate-200 text-slate-600 hover:text-unihealth-green hover:bg-emerald-50 transition-all shrink-0">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+                    </button>
+                    <div class="min-w-0">
+                        <h1 id="header-module-title" class="text-base sm:text-lg font-extrabold text-slate-800 truncate">Contas a Pagar — TOTVS Protheus (SE2)</h1>
+                        <p id="header-module-subtitle" class="text-xs text-slate-500 truncate">Hospital Unihealth Governador Valadares • Gestão ICDS</p>
+                    </div>
                 </div>
 
-                <div class="flex items-center gap-2.5">
+                <div class="flex items-center gap-2.5 shrink-0">
                     <button onclick="forceManualDriveSync()" class="px-3 py-2 text-xs font-semibold text-slate-600 hover:text-unihealth-green bg-slate-100 hover:bg-emerald-50 rounded-xl transition-all flex items-center gap-1.5">
                         <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
                         <span class="hidden sm:inline">Sincronizar</span>
@@ -176,20 +206,20 @@
             </header>
 
             <!-- CONTEÚDO DOS MÓDULOS -->
-            <main class="flex-1 p-4 sm:p-6 space-y-5 overflow-y-auto">
+            <main class="flex-1 w-full p-4 sm:p-5 space-y-4 overflow-y-auto">
 
                 <!-- ================================================= -->
-                <!-- MÓDULO 1: CONTAS A PAGAR                          -->
+                <!-- MÓDULO 1: CONTAS A PAGAR — TOTVS PROTHEUS (SE2)   -->
                 <!-- ================================================= -->
-                <section id="view-payables" class="space-y-5">
+                <section id="view-payables" class="space-y-4">
                     <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm flex flex-wrap items-center justify-between gap-3">
                         <div class="flex flex-wrap items-center gap-2">
-                            <button onclick="openProtheusModal()" class="px-4 py-2 bg-unihealth-green hover:bg-unihealth-greenMid text-white text-xs font-bold rounded-xl shadow-sm flex items-center gap-2 transition-all">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
-                                <span>Atualizar via Relatório Protheus (.CSV / .XLSX)</span>
+                            <button onclick="openProtheusModal()" class="px-4 py-2 bg-unihealth-green hover:bg-unihealth-greenMid text-white text-xs font-bold rounded-xl shadow-sm flex items-center gap-1.5 transition-all">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/></svg>
+                                <span>Importar Relatório Protheus (.CSV / .XLSX)</span>
                             </button>
-                            <button onclick="openNewPayableModal()" class="px-3.5 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl transition-all">
-                                + Novo Título Manual
+                            <button onclick="openNewPayableModal()" class="px-3.5 py-2 bg-emerald-50 hover:bg-emerald-100 text-unihealth-green border border-emerald-200 text-xs font-bold rounded-xl transition-all">
+                                + Novo Título
                             </button>
                             <button onclick="openPlannedPaymentsModal()" class="px-3.5 py-2 bg-indigo-50 hover:bg-indigo-100 text-indigo-800 border border-indigo-200 text-xs font-bold rounded-xl transition-all">
                                 + Pagamentos Previstos (Fora Protheus)
@@ -449,83 +479,70 @@
                     <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm flex flex-wrap items-center justify-between gap-3">
                         <div>
                             <h2 class="text-sm font-extrabold text-slate-800">Contas a Receber — Cartões Cielo &amp; Convênios</h2>
-                            <p class="text-xs text-slate-500">Controle de vendas no crédito (desdobramento 30 em 30 dias), baixa automática via Recebíveis Cielo e lançamentos de convênios</p>
+                            <p class="text-xs text-slate-500">Parcelas de crédito (30 em 30 dias), baixa automática por recebíveis Cielo, convênios manuais e recebimentos da CC 0001127-4</p>
                         </div>
                         <div class="flex flex-wrap items-center gap-2">
-                            <button onclick="openCieloImportModal()" class="px-4 py-2 bg-sky-700 hover:bg-sky-800 text-white text-xs font-bold rounded-xl shadow-sm flex items-center gap-2 transition-all">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/></svg>
+                            <button onclick="openCieloImportModal()" class="px-4 py-2 bg-unihealth-green hover:bg-unihealth-greenMid text-white text-xs font-bold rounded-xl shadow-sm flex items-center gap-1.5 transition-all">
                                 <span>Importar Cielo (Vendas / Recebíveis .PDF)</span>
                             </button>
-                            <button onclick="openConveniosModal()" class="px-4 py-2 bg-unihealth-green hover:bg-unihealth-greenMid text-white text-xs font-bold rounded-xl shadow-sm transition-all">
-                                + Lançar Convênios a Receber
+                            <button onclick="openConveniosModal()" class="px-3.5 py-2 bg-indigo-50 hover:bg-indigo-100 text-indigo-800 border border-indigo-200 text-xs font-bold rounded-xl transition-all">
+                                + Lançar Convênios
                             </button>
-                            <button onclick="openBankPdfModal()" class="px-3.5 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl transition-all">
-                                Importar Mov. CC 0001127-4
+                            <button onclick="openBankPdfModal()" class="px-3.5 py-2 bg-sky-50 hover:bg-sky-100 text-sky-800 border border-sky-200 text-xs font-bold rounded-xl transition-all">
+                                Importar Movimentação CC 0001127-4
                             </button>
                         </div>
                     </div>
 
-                    <!-- 4 Quadros Executivos do Contas a Receber -->
                     <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
-                        <!-- Card 1: A Receber no Mês Corrente (com imput manual de data para consultar períodos superiores) -->
-                        <div class="bg-white p-4 rounded-2xl border border-emerald-200 shadow-sm">
-                            <div class="flex items-center justify-between gap-1">
-                                <span id="cr-kpi-month-title" class="text-[11px] font-bold uppercase text-unihealth-green">A Receber no Mês Corrente</span>
-                            </div>
+                        <div onclick="filterReceivablesByCard('all', 'Previsto')" class="bg-white p-4 rounded-2xl border border-emerald-200 hover:border-unihealth-green cursor-pointer shadow-sm transition-all">
+                            <span id="cr-kpi-month-title" class="text-[11px] font-bold uppercase text-unihealth-green">A Receber no Mês Corrente</span>
                             <p id="cr-kpi-month-open" class="text-xl font-extrabold text-slate-800 mt-1.5">R$ 0,00</p>
-                            <div class="flex items-center justify-between gap-1 mt-1.5 pt-1.5 border-t border-slate-100">
-                                <span id="cr-kpi-month-sub" class="text-[10px] text-slate-500">Convênios + Cartão</span>
-                                <label class="flex items-center gap-1 text-[10px] font-bold text-slate-600">
+                            <div class="flex items-center justify-between gap-1 mt-1" onclick="event.stopPropagation()">
+                                <span id="cr-kpi-month-sub" class="text-[10px] text-slate-500">Convênios + Cartão Mês</span>
+                                <label class="flex items-center gap-1 text-[10px] font-semibold text-slate-600">
                                     <span>Até:</span>
                                     <input type="date" id="cr-cutoff-date" onchange="renderReceivablesModule()" class="px-1.5 py-0.5 text-[10px] border border-slate-200 rounded bg-slate-50">
                                 </label>
                             </div>
                         </div>
 
-                        <!-- Card 2: Cartão de Crédito (Todas as vendas no crédito ainda não recebidas) -->
-                        <div onclick="filterReceivablesByCard('Cartão de Crédito', 'Previsto')" class="bg-white p-4 rounded-2xl border border-sky-200 hover:border-sky-400 cursor-pointer shadow-sm transition-all">
-                            <div class="flex items-center justify-between">
-                                <span class="text-[11px] font-bold uppercase text-sky-700">Cartão de Crédito</span>
-                                <span class="text-[10px] font-bold bg-sky-50 text-sky-800 px-2 py-0.5 rounded-full">Em Aberto</span>
-                            </div>
+                        <div onclick="filterReceivablesByCard('Cartão de Crédito', 'Previsto')" class="bg-white p-4 rounded-2xl border border-sky-200 hover:border-sky-500 cursor-pointer shadow-sm transition-all">
+                            <span class="text-[11px] font-bold uppercase text-sky-700">Cartão de Crédito</span>
                             <p id="cr-kpi-cards-future" class="text-xl font-extrabold text-sky-800 mt-1.5">R$ 0,00</p>
-                            <p id="cr-kpi-cards-sub" class="text-[11px] text-slate-500 mt-0.5">0 parcela(s) de crédito a receber</p>
+                            <p id="cr-kpi-cards-sub" class="text-[11px] text-slate-500 mt-0.5">Total vendas crédito a receber</p>
                         </div>
 
-                        <!-- Card 3: Convênios (abre imput manual direto) -->
-                        <div onclick="openConveniosModal()" class="bg-white p-4 rounded-2xl border border-indigo-200 hover:border-indigo-400 cursor-pointer shadow-sm transition-all group">
+                        <div onclick="openConveniosModal()" class="bg-white p-4 rounded-2xl border border-indigo-200 hover:border-indigo-500 cursor-pointer shadow-sm transition-all group">
                             <div class="flex items-center justify-between">
                                 <span class="text-[11px] font-bold uppercase text-indigo-700">Convênios</span>
-                                <span class="text-[10px] font-bold bg-indigo-50 text-indigo-800 px-2 py-0.5 rounded-full group-hover:bg-indigo-600 group-hover:text-white transition-all">+ Lançar</span>
+                                <span class="text-[10px] font-bold bg-indigo-50 text-indigo-800 px-2 py-0.5 rounded-full group-hover:bg-indigo-700 group-hover:text-white transition-all">+ Lançar</span>
                             </div>
                             <p id="cr-kpi-convenios-open" class="text-xl font-extrabold text-indigo-800 mt-1.5">R$ 0,00</p>
-                            <p id="cr-kpi-convenios-sub" class="text-[11px] text-slate-500 mt-0.5">0 convênio(s) previsto(s) a receber</p>
+                            <p id="cr-kpi-convenios-sub" class="text-[11px] text-slate-500 mt-0.5">Previsão manual de convênios</p>
                         </div>
 
-                        <!-- Card 4: Recebidos no Mês Corrente (com demonstrativo detalhado PIX / Débito / Crédito / Convênios) -->
-                        <div onclick="openReceivedMonthBreakdownModal()" class="bg-white p-4 rounded-2xl border border-slate-200 hover:border-unihealth-green cursor-pointer shadow-sm transition-all group">
+                        <div onclick="openReceivedMonthBreakdownModal()" class="bg-white p-4 rounded-2xl border border-emerald-300 hover:border-unihealth-green cursor-pointer shadow-sm transition-all group">
                             <div class="flex items-center justify-between">
-                                <span class="text-[11px] font-bold uppercase text-slate-600">Recebidos no Mês Corrente</span>
+                                <span class="text-[11px] font-bold uppercase text-unihealth-green">Recebidos no Mês Corrente</span>
                                 <span class="text-[10px] font-bold bg-emerald-50 text-unihealth-green px-2 py-0.5 rounded-full group-hover:bg-unihealth-green group-hover:text-white transition-all">Demonstrativo</span>
                             </div>
                             <p id="cr-kpi-received-month" class="text-xl font-extrabold text-unihealth-green mt-1.5">R$ 0,00</p>
-                            <p id="cr-kpi-received-sub" class="text-[11px] text-slate-500 mt-0.5">Clique para ver PIX, Débito, Crédito e Convênios</p>
+                            <p id="cr-kpi-received-sub" class="text-[10px] text-slate-500 mt-0.5 truncate">PIX • Débito • Crédito • Convênios</p>
                         </div>
                     </div>
 
-                    <!-- Cronograma Mensal de Recebimentos de Cartão de Crédito -->
                     <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm space-y-3">
                         <div class="flex items-center justify-between">
                             <div>
-                                <h3 class="text-xs font-extrabold uppercase text-slate-700">Fluxo Futuro de Recebimentos — Cartão de Crédito (Parcelas 30 em 30 dias)</h3>
-                                <p class="text-[11px] text-slate-500">Parcelas geradas pelo Extrato de Vendas Cielo ainda pendentes de recebimento</p>
+                                <h3 class="text-xs font-extrabold uppercase text-slate-700">Fluxo Futuro de Recebimentos — Cartão de Crédito (30 em 30 Dias)</h3>
+                                <p class="text-[11px] text-slate-500">Parcelas geradas a partir das vendas no crédito e baixadas automaticamente pelos recebíveis Cielo</p>
                             </div>
                             <span id="cr-card-schedule-total" class="text-xs font-extrabold text-sky-700">Total a Receber Crédito: R$ 0,00</span>
                         </div>
                         <div id="cr-card-months-grid" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2.5"></div>
                     </div>
 
-                    <!-- Tabela de Títulos a Receber -->
                     <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
                         <div class="p-4 border-b border-slate-200 flex flex-wrap items-center justify-between gap-3">
                             <div class="flex flex-wrap items-center gap-2">
@@ -533,33 +550,34 @@
                                     <option value="all">Todas as Origens</option>
                                     <option value="Cartão de Crédito">Cartão de Crédito</option>
                                     <option value="Cartão de Débito">Cartão de Débito</option>
-                                    <option value="PIX">PIX / Particular</option>
+                                    <option value="PIX">PIX</option>
                                     <option value="Convênio">Convênios</option>
                                 </select>
                                 <select id="cr-filter-status" onchange="resetReceivablesPageAndRender()" class="px-3 py-2 text-xs border border-slate-200 rounded-xl bg-white font-semibold">
                                     <option value="all">Todos os Status</option>
-                                    <option value="Previsto" selected>A Receber (Previsto)</option>
-                                    <option value="Recebido">Recebido / Liquidado</option>
+                                    <option value="Previsto">Previsto (A Receber)</option>
+                                    <option value="Recebido">Recebido</option>
                                 </select>
-                                <input type="text" id="cr-filter-search" oninput="debouncedRenderReceivables()" placeholder="Buscar convênio, bandeira ou parcela..." class="px-3 py-2 text-xs border border-slate-200 rounded-xl w-60">
+                                <input type="text" id="cr-filter-search" oninput="debouncedRenderReceivables()" placeholder="Buscar bandeira, convênio ou histórico..." class="px-3 py-2 text-xs border border-slate-200 rounded-xl w-56">
                             </div>
-                            <span id="cr-count-label" class="text-xs text-slate-500">0 recebíveis</span>
+                            <span id="cr-count-label" class="text-xs text-slate-500">0 recebível(is)</span>
                         </div>
+
                         <div class="overflow-x-auto">
-                            <table class="w-full text-left border-collapse text-xs">
+                            <table class="w-full text-left border-collapse">
                                 <thead>
                                     <tr class="bg-slate-50 border-b border-slate-200 text-[10px] font-bold uppercase text-slate-500">
                                         <th class="py-3 px-3">Data Prevista</th>
                                         <th class="py-3 px-3">Origem</th>
-                                        <th class="py-3 px-3">Convênio / Bandeira</th>
+                                        <th class="py-3 px-3">Convênio / Bandeira / Pagador</th>
                                         <th class="py-3 px-3">Parcela</th>
-                                        <th class="py-3 px-3">Observação / Histórico</th>
+                                        <th class="py-3 px-3">Histórico / Observação</th>
                                         <th class="py-3 px-3 text-right">Valor (R$)</th>
                                         <th class="py-3 px-3 text-center">Status</th>
                                         <th class="py-3 px-3 text-center">Ações</th>
                                     </tr>
                                 </thead>
-                                <tbody id="cr-tbody" class="divide-y divide-slate-100"></tbody>
+                                <tbody id="cr-tbody" class="divide-y divide-slate-100 text-xs"></tbody>
                             </table>
                         </div>
                         <div class="px-4 py-3 bg-slate-50 border-t border-slate-200 flex items-center justify-between text-xs text-slate-600">
@@ -576,49 +594,39 @@
                 <!-- MÓDULO 4: FLUXO DE CAIXA (LIVRE DAS PROVISÕES)    -->
                 <!-- ================================================= -->
                 <section id="view-cashflow" class="hidden space-y-5">
-                    <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm flex flex-wrap items-center justify-between gap-3">
-                        <div>
-                            <h2 class="text-sm font-extrabold text-slate-800">Fluxo de Caixa Projetado — Fechamento do Mês (Livre das Provisões)</h2>
-                            <p class="text-xs text-slate-500">Projeção considerando exclusivamente o saldo operacional livre (deduzidas as provisões trabalhistas)</p>
-                        </div>
-                        <button onclick="openProjectedBalanceModal()" class="px-4 py-2 bg-unihealth-green hover:bg-unihealth-greenMid text-white text-xs font-bold rounded-xl shadow-sm transition-all">
-                            Abrir Memória de Cálculo
-                        </button>
-                    </div>
-
-                    <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                         <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm">
-                            <span class="text-[11px] font-bold uppercase text-slate-500">Disponível Livre (s/ Provisões)</span>
+                            <span class="text-[11px] font-bold uppercase text-slate-500">Saldo Bancário Livre (Hoje)</span>
                             <p id="cf-kpi-free-available" class="text-xl font-extrabold text-slate-800 mt-1.5">R$ 0,00</p>
-                            <p id="cf-kpi-free-sub" class="text-[11px] text-amber-700 font-semibold mt-0.5">Provisões deduzidas: R$ 0,00</p>
+                            <p id="cf-kpi-free-sub" class="text-[11px] text-amber-700 mt-0.5">Provisões deduzidas: R$ 0,00</p>
                         </div>
 
-                        <div onclick="openUnimedContractModal()" class="bg-white p-4 rounded-2xl border border-emerald-200 hover:border-unihealth-green cursor-pointer shadow-sm transition-all">
-                            <span class="text-[11px] font-bold uppercase text-unihealth-green">(+) Entradas Previstas (Unimed + CR)</span>
+                        <div class="bg-white p-4 rounded-2xl border border-emerald-200 shadow-sm">
+                            <span class="text-[11px] font-bold uppercase text-unihealth-green">(+) Entradas Previstas (Mês)</span>
                             <p id="cf-kpi-unimed-pending" class="text-xl font-extrabold text-unihealth-green mt-1.5">R$ 0,00</p>
-                            <p id="cf-kpi-entries-sub" class="text-[11px] text-slate-400 mt-0.5">Pendente Unimed + Cartões/Convênios Mês</p>
+                            <p id="cf-kpi-entries-sub" class="text-[11px] text-slate-500 mt-0.5">Unimed + Contas a Receber</p>
                         </div>
 
-                        <div onclick="switchModule('payables')" class="bg-white p-4 rounded-2xl border border-rose-200 hover:border-rose-400 cursor-pointer shadow-sm transition-all">
-                            <span class="text-[11px] font-bold uppercase text-rose-600">(−) Contas a Pagar (Mês)</span>
+                        <div class="bg-white p-4 rounded-2xl border border-rose-200 shadow-sm">
+                            <span class="text-[11px] font-bold uppercase text-rose-600">(−) Compromissos CP + Prev. (Mês)</span>
                             <p id="cf-kpi-cp-open" class="text-xl font-extrabold text-rose-600 mt-1.5">R$ 0,00</p>
-                            <p id="cf-kpi-cp-sub" class="text-[11px] text-slate-400 mt-0.5">Em aberto no mês corrente</p>
+                            <p id="cf-kpi-cp-sub" class="text-[11px] text-slate-500 mt-0.5">0 título(s) no mês corrente</p>
                         </div>
 
-                        <div onclick="openProjectedBalanceModal()" class="bg-gradient-to-br from-[#013A19] to-unihealth-greenMid text-white p-4 rounded-2xl shadow-md cursor-pointer hover:opacity-95 transition-all">
-                            <div class="flex items-center justify-between">
-                                <span id="cf-kpi-final-title" class="text-[11px] font-bold uppercase text-emerald-200">Saldo Previsto Final do Mês</span>
-                                <span class="text-[10px] font-bold bg-white/15 px-2 py-0.5 rounded-full">Livre Provisões</span>
-                            </div>
+                        <div onclick="openProjectedBalanceModal()" class="bg-[#013A19] text-white p-4 rounded-2xl shadow-sm cursor-pointer hover:opacity-95 transition-all">
+                            <span id="cf-kpi-final-title" class="text-[11px] font-bold uppercase text-emerald-300">Saldo Previsto p/ Fechamento</span>
                             <p id="cf-kpi-final-balance" class="text-2xl font-extrabold text-white mt-1.5">R$ 0,00</p>
-                            <p class="text-[11px] text-emerald-100 mt-0.5">Livre Prov. + Entradas Previstas − CP Mês</p>
+                            <p class="text-[11px] text-emerald-200 mt-0.5">Clique para memória de cálculo</p>
                         </div>
                     </div>
 
                     <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
-                        <div class="px-4 py-3.5 border-b border-slate-200 flex items-center justify-between">
-                            <h3 class="text-xs font-extrabold uppercase text-slate-700">Compromissos em Aberto no Mês Corrente (CP + Pagamentos Previstos)</h3>
-                            <span id="cf-list-count" class="text-xs text-slate-500">0 títulos</span>
+                        <div class="p-4 border-b border-slate-200 flex items-center justify-between">
+                            <div>
+                                <h3 class="text-xs font-extrabold uppercase text-slate-700">Cronograma de Saídas Previstas no Mês Corrente</h3>
+                                <p class="text-[11px] text-slate-500">Títulos em aberto no Contas a Pagar + Pagamentos Previstos</p>
+                            </div>
+                            <span id="cf-list-count" class="text-xs font-semibold text-slate-500">0 título(s)</span>
                         </div>
                         <div class="overflow-x-auto">
                             <table class="w-full text-left border-collapse text-xs">
@@ -627,10 +635,140 @@
                                         <th class="py-2.5 px-3">Vencimento</th>
                                         <th class="py-2.5 px-3">Fornecedor / Descrição</th>
                                         <th class="py-2.5 px-3">Origem</th>
-                                        <th class="py-2.5 px-3 text-right">Saldo a Pagar</th>
+                                        <th class="py-2.5 px-3 text-right">Valor (R$)</th>
                                     </tr>
                                 </thead>
                                 <tbody id="cf-tbody" class="divide-y divide-slate-100"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ================================================= -->
+                <!-- MÓDULO 5: NOTAS DE DÉBITO (OPERADORA UNIMED)      -->
+                <!-- ================================================= -->
+                <section id="view-debit-notes" class="hidden space-y-4">
+                    <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm flex flex-wrap items-center justify-between gap-3">
+                        <div>
+                            <h2 class="text-sm font-extrabold text-slate-800">Notas de Débito — Pagamentos Diretos da Operadora</h2>
+                            <p class="text-xs text-slate-500">Duplique o mês anterior por competência ou fornecedor ("+"), ajuste o valor e valide para o encontro de contas</p>
+                        </div>
+                        <div class="flex flex-wrap items-center gap-2">
+                            <button type="button" onclick="openNewCompetenciaDebitNotesModal()" class="px-3.5 py-2 bg-violet-700 hover:bg-violet-800 text-white text-xs font-bold rounded-xl shadow-sm transition-all">
+                                + Nova Competência
+                            </button>
+                            <button type="button" onclick="openNewDebitNoteModal()" class="px-3.5 py-2 bg-unihealth-green hover:bg-unihealth-greenMid text-white text-xs font-bold rounded-xl shadow-sm transition-all">
+                                + Nova Nota
+                            </button>
+                            <label class="px-3.5 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl cursor-pointer transition-all">
+                                <span>Importar Planilha (.XLSX / .CSV)</span>
+                                <input type="file" accept=".xlsx,.xls,.csv" onchange="handleDebitNotesFileImport(event)" class="hidden">
+                            </label>
+                            <button type="button" onclick="exportDebitNotesExcel()" class="px-3 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-100 border border-slate-200 rounded-xl transition-all">
+                                Exportar lançamentos
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+                        <div class="p-4 border-b border-slate-200 flex flex-wrap items-center justify-between gap-3">
+                            <div class="flex flex-wrap items-center gap-2">
+                                <select id="nd-filter-competencia" onchange="renderDebitNotesModule()" class="px-3 py-2 text-xs border border-slate-200 rounded-xl bg-white font-semibold">
+                                    <option value="all">Todas as Competências</option>
+                                </select>
+                                <select id="nd-filter-status" onchange="renderDebitNotesModule()" class="px-3 py-2 text-xs border border-slate-200 rounded-xl bg-white font-semibold">
+                                    <option value="all">Todos os Status</option>
+                                    <option value="Pendente">Pendente Conferência</option>
+                                    <option value="Validado">Validado</option>
+                                </select>
+                                <select id="nd-filter-budget" onchange="renderDebitNotesModule()" class="px-3 py-2 text-xs border border-slate-200 rounded-xl bg-white font-semibold max-w-[230px]">
+                                    <option value="all">Todos os Orçamentos</option>
+                                </select>
+                                <input type="text" id="nd-filter-search" oninput="renderDebitNotesModule()" placeholder="Buscar fornecedor, nota ou observação..." class="px-3 py-2 text-xs border border-slate-200 rounded-xl w-56">
+                            </div>
+                            <div class="flex flex-wrap items-center gap-2">
+                                <div class="flex items-center gap-1.5 bg-violet-50 border border-violet-200 px-2.5 py-1.5 rounded-xl">
+                                    <span class="text-[10px] font-bold uppercase text-violet-800">Competência de Destino:</span>
+                                    <input type="text" id="nd-quick-target-comp" value="11/2026" placeholder="MM/AAAA" class="w-20 px-2 py-0.5 text-xs font-bold text-center border border-violet-300 rounded-lg bg-white">
+                                    <button type="button" onclick="duplicatePreviousFromQuickCompetencia()" class="px-2.5 py-1 bg-violet-700 hover:bg-violet-800 text-white text-[10px] font-bold rounded-lg transition-all">
+                                        Duplicar Mês Ant.
+                                    </button>
+                                </div>
+                                <span id="nd-count-label" class="text-xs text-slate-500">0 lançamento(s)</span>
+                            </div>
+                        </div>
+
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left border-collapse text-[11px]">
+                                <thead>
+                                    <tr class="bg-slate-50 border-b border-slate-200 text-[10px] font-bold uppercase text-slate-500 select-none">
+                                        <th onclick="toggleDebitNoteSort('competencia')" class="py-2.5 px-2 cursor-pointer hover:text-unihealth-green whitespace-nowrap">Compet. <span id="nd-sort-ind-competencia">▲</span></th>
+                                        <th onclick="toggleDebitNoteSort('debitNoteNumber')" class="py-2.5 px-1.5 cursor-pointer hover:text-unihealth-green whitespace-nowrap">ND <span id="nd-sort-ind-debitNoteNumber"></span></th>
+                                        <th onclick="toggleDebitNoteSort('invoiceNumber')" class="py-2.5 px-1.5 cursor-pointer hover:text-unihealth-green whitespace-nowrap">Nota Fiscal <span id="nd-sort-ind-invoiceNumber"></span></th>
+                                        <th onclick="toggleDebitNoteSort('supplier')" class="py-2.5 px-2 cursor-pointer hover:text-unihealth-green">Fornecedor <span id="nd-sort-ind-supplier"></span></th>
+                                        <th onclick="toggleDebitNoteSort('origin')" class="py-2.5 px-1.5 cursor-pointer hover:text-unihealth-green whitespace-nowrap">Origem <span id="nd-sort-ind-origin"></span></th>
+                                        <th onclick="toggleDebitNoteSort('budget')" class="py-2.5 px-1.5 cursor-pointer hover:text-unihealth-green">Orçamento <span id="nd-sort-ind-budget"></span></th>
+                                        <th onclick="toggleDebitNoteSort('species')" class="py-2.5 px-1.5 cursor-pointer hover:text-unihealth-green">Espécie <span id="nd-sort-ind-species"></span></th>
+                                        <th onclick="toggleDebitNoteSort('amount')" class="py-2.5 px-2 text-right cursor-pointer hover:text-unihealth-green whitespace-nowrap">Valor (R$) <span id="nd-sort-ind-amount"></span></th>
+                                        <th onclick="toggleDebitNoteSort('status')" class="py-2.5 px-2 text-center cursor-pointer hover:text-unihealth-green whitespace-nowrap">Status <span id="nd-sort-ind-status"></span></th>
+                                        <th class="py-2.5 px-2 text-center whitespace-nowrap">Ações</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="nd-tbody" class="divide-y divide-slate-100"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ================================================= -->
+                <!-- MÓDULO 6: ENCONTRO DE CONTAS 2026                 -->
+                <!-- ================================================= -->
+                <section id="view-account-settlement" class="hidden space-y-4">
+                    <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm flex flex-wrap items-center justify-between gap-3">
+                        <div>
+                            <h2 class="text-sm font-extrabold text-slate-800">Encontro de Contas 2026 — Operadora Unimed GV × Unihealth (ICDS)</h2>
+                            <p class="text-xs text-slate-500">Integração automática: Contrato Unimed + Notas de Débito + Repasses CC 0001234-3 + Lançamentos de Reembolso &amp; Produção</p>
+                        </div>
+                        <div class="flex flex-wrap items-center gap-2">
+                            <button type="button" onclick="openUnimedContractModal()" class="px-3.5 py-2 bg-emerald-50 hover:bg-emerald-100 text-unihealth-green border border-emerald-200 text-xs font-bold rounded-xl transition-all">
+                                Editar Contrato Unimed
+                            </button>
+                            <button type="button" onclick="saveAccountSettlementManualChanges()" class="px-4 py-2 bg-unihealth-green hover:bg-unihealth-greenMid text-white text-xs font-bold rounded-xl shadow-sm transition-all">
+                                Salvar Lançamentos no Drive
+                            </button>
+                            <button type="button" onclick="exportAccountSettlementExcel()" class="px-3 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-100 border border-slate-200 rounded-xl transition-all">
+                                Exportar lançamentos
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+                        <div class="px-4 py-2.5 bg-[#013A19] text-white flex flex-wrap items-center justify-between gap-2">
+                            <span class="text-xs font-extrabold uppercase tracking-wide">Demonstrativo Mensal — Encontro de Contas 2026 (Valores em R$)</span>
+                            <span class="text-[11px] text-emerald-200">Campos editáveis em destaque suave • Acumulado considera de jan/26 até o último mês selecionado</span>
+                        </div>
+
+                        <div class="px-4 py-2 bg-slate-50 border-b border-slate-200 flex flex-wrap items-center justify-between gap-2">
+                            <div class="flex flex-wrap items-center gap-1.5">
+                                <span class="text-[10px] font-bold uppercase text-slate-500 mr-1">Exibir Meses:</span>
+                                <div id="es-months-filter-pills" class="flex flex-wrap items-center gap-1"></div>
+                            </div>
+                            <div class="flex items-center gap-1.5">
+                                <button type="button" onclick="setAccountSettlementMonthsPreset('jan-out')" class="px-2.5 py-1 text-[10px] font-bold bg-white border border-slate-200 hover:bg-slate-100 text-slate-700 rounded-lg">Jan–Out/26</button>
+                                <button type="button" onclick="setAccountSettlementMonthsPreset('all')" class="px-2.5 py-1 text-[10px] font-bold bg-white border border-slate-200 hover:bg-slate-100 text-slate-700 rounded-lg">Todos (Jan–Dez)</button>
+                            </div>
+                        </div>
+
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left border-collapse text-[10px]">
+                                <thead>
+                                    <tr id="es-matrix-thead-row" class="bg-[#0A5C36] text-white text-[9.5px] font-bold uppercase">
+                                        <th class="py-2 px-2 sticky left-0 bg-[#0A5C36] z-10 w-[235px] max-w-[235px]">ENCONTRO DE CONTAS 2026</th>
+                                        <th class="py-2 px-1 text-center w-7">Sinal</th>
+                                        <th class="py-2 px-2 text-right bg-[#013A19]">ACUMULADO</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="es-matrix-tbody" class="divide-y divide-slate-200"></tbody>
                             </table>
                         </div>
                     </div>
@@ -1402,6 +1540,92 @@
         </div>
     </div>
 
+    <!-- MODAL 13: NOVA COMPETÊNCIA — NOTAS DE DÉBITO (DUPLICA MÊS ANTERIOR) -->
+    <div id="nd-new-competencia-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs hidden items-center justify-center p-4 z-50">
+        <div class="bg-white w-full max-w-md rounded-2xl shadow-2xl border border-slate-200 overflow-hidden">
+            <div class="px-5 py-4 bg-violet-900 text-white flex items-center justify-between">
+                <div>
+                    <h3 class="text-sm font-extrabold">Gerar Nova Competência — Notas de Débito</h3>
+                    <p class="text-[11px] text-violet-200">Duplica os fornecedores e valores do mês anterior para a competência escolhida</p>
+                </div>
+                <button onclick="closeNewCompetenciaDebitNotesModal()" class="text-white/80 hover:text-white text-xl font-bold">&times;</button>
+            </div>
+            <form onsubmit="confirmNewCompetenciaDebitNotes(event)" class="p-5 space-y-3 text-xs">
+                <div>
+                    <label class="block font-bold text-slate-600 mb-1">Mês / Ano de Destino (MM/AAAA)</label>
+                    <input type="text" id="nd-target-comp-input" required pattern="\d{2}/\d{4}" placeholder="Ex.: 11/2026" class="w-full px-3 py-2 border border-slate-200 rounded-xl font-bold">
+                </div>
+                <div id="nd-prev-comp-preview" class="p-3 bg-violet-50 border border-violet-200 rounded-xl text-[11px] text-violet-900"></div>
+                <div class="pt-2 flex justify-end gap-2">
+                    <button type="button" onclick="closeNewCompetenciaDebitNotesModal()" class="px-4 py-2 font-semibold text-slate-600 rounded-xl">Cancelar</button>
+                    <button type="submit" class="px-4 py-2 font-bold text-white bg-violet-700 hover:bg-violet-800 rounded-xl">Duplicar Competência</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL 14: CRIAR / EDITAR NOTA DE DÉBITO -->
+    <div id="nd-edit-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs hidden items-center justify-center p-4 z-50">
+        <div class="bg-white w-full max-w-2xl rounded-2xl shadow-2xl border border-slate-200 overflow-hidden">
+            <div class="px-5 py-4 bg-slate-50 border-b border-slate-200 flex items-center justify-between">
+                <h3 id="nd-edit-modal-title" class="text-sm font-extrabold text-slate-800">Lançar / Editar Nota de Débito</h3>
+                <button onclick="closeDebitNoteEditModal()" class="text-slate-400 hover:text-slate-600 text-lg font-bold">&times;</button>
+            </div>
+            <form onsubmit="saveDebitNoteForm(event)" class="p-5 space-y-3 text-xs">
+                <input type="hidden" id="nd-edit-id">
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                    <div>
+                        <label class="block font-bold text-slate-600 mb-1">Competência (MM/AAAA)</label>
+                        <input type="text" id="nd-edit-comp" required pattern="\d{2}/\d{4}" placeholder="Ex.: 11/2026" class="w-full px-3 py-2 border border-slate-200 rounded-xl font-bold">
+                    </div>
+                    <div>
+                        <label class="block font-bold text-slate-600 mb-1">Nota de Débito</label>
+                        <input type="text" id="nd-edit-nd" placeholder="Ex.: ND 2018" class="w-full px-3 py-2 border border-slate-200 rounded-xl">
+                    </div>
+                    <div>
+                        <label class="block font-bold text-slate-600 mb-1">Nota Fiscal</label>
+                        <input type="text" id="nd-edit-nf" placeholder="Ex.: NF 000014116" class="w-full px-3 py-2 border border-slate-200 rounded-xl">
+                    </div>
+                </div>
+                <div>
+                    <label class="block font-bold text-slate-600 mb-1">Fornecedor</label>
+                    <input type="text" id="nd-edit-supplier" required placeholder="Nome do fornecedor" class="w-full px-3 py-2 border border-slate-200 rounded-xl">
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                    <div>
+                        <label class="block font-bold text-slate-600 mb-1">Origem</label>
+                        <input type="text" id="nd-edit-origin" placeholder="Ex.: Operadora / Unimed" class="w-full px-3 py-2 border border-slate-200 rounded-xl">
+                    </div>
+                    <div>
+                        <label class="block font-bold text-slate-600 mb-1">Orçamento</label>
+                        <input type="text" id="nd-edit-budget" placeholder="Ex.: OPME / Farmácia" class="w-full px-3 py-2 border border-slate-200 rounded-xl">
+                    </div>
+                    <div>
+                        <label class="block font-bold text-slate-600 mb-1">Espécie</label>
+                        <input type="text" id="nd-edit-species" placeholder="Ex.: ND / NF / FT" class="w-full px-3 py-2 border border-slate-200 rounded-xl">
+                    </div>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                        <label class="block font-bold text-slate-600 mb-1">Valor (R$)</label>
+                        <input type="number" step="0.01" id="nd-edit-amount" required class="w-full px-3 py-2 border border-slate-200 rounded-xl font-bold">
+                    </div>
+                    <div>
+                        <label class="block font-bold text-slate-600 mb-1">Status Conferência</label>
+                        <select id="nd-edit-status" class="w-full px-3 py-2 border border-slate-200 rounded-xl bg-white">
+                            <option value="Pendente">Pendente</option>
+                            <option value="Validado">Validado</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="pt-2 flex justify-end gap-2">
+                    <button type="button" onclick="closeDebitNoteEditModal()" class="px-4 py-2 font-semibold text-slate-600 rounded-xl">Cancelar</button>
+                    <button type="submit" class="px-4 py-2 font-bold text-white bg-unihealth-green rounded-xl">Salvar Nota de Débito</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <!-- TOAST NOTIFICAÇÃO -->
     <div id="toast-box" class="fixed bottom-5 right-5 bg-slate-900 text-white text-xs font-semibold px-4 py-3 rounded-xl shadow-xl hidden z-50"></div>
 
@@ -1624,6 +1848,26 @@
 
         var plannedPayments = [];
         var receivables = [];
+        var debitNotes = [];
+        var debitNoteSort = { key: 'competencia', dir: 'asc' };
+        var accountSettlementSchedule = {};
+        var esVisibleMonths = {
+            '2026-01': true, '2026-02': true, '2026-03': true, '2026-04': true,
+            '2026-05': true, '2026-06': true, '2026-07': true, '2026-08': true,
+            '2026-09': true, '2026-10': true, '2026-11': false, '2026-12': false
+        };
+        const ES_FIXED_REPASSE_UNIMED_2026 = {
+            '2026-01': 6179000.00,
+            '2026-02': 8190000.00,
+            '2026-03': 8500000.00,
+            '2026-04': 9100000.00,
+            '2026-05': 9100000.00,
+            '2026-06': 9075000.00,
+            '2026-07': 7800000.00,
+            '2026-08': 9074000.00,
+            '2026-09': 9075000.00,
+            '2026-10': 8500000.00
+        };
         let plannedPaymentsDraft = [];
         let conveniosDraft = [];
         let currentPage = 1;
@@ -1737,6 +1981,8 @@
                     provisionsSchedule,
                     plannedPayments,
                     receivables,
+                    debitNotes,
+                    accountSettlementSchedule,
                     updatedAt: nowIso
                 });
                 const res = await fetch(url, {
@@ -1812,6 +2058,14 @@
                             receivables = remoteData.receivables;
                             batch.push(['receivables_list', receivables]);
                         }
+                        if (Array.isArray(remoteData.debitNotes)) {
+                            debitNotes = remoteData.debitNotes;
+                            batch.push(['debit_notes_list', debitNotes]);
+                        }
+                        if (remoteData.accountSettlementSchedule && typeof remoteData.accountSettlementSchedule === 'object') {
+                            accountSettlementSchedule = { ...accountSettlementSchedule, ...remoteData.accountSettlementSchedule };
+                            batch.push(['account_settlement_schedule', accountSettlementSchedule]);
+                        }
                         if (batch.length > 0) await saveBatchToIndexedDB(batch);
                         localStorage.setItem(LOCAL_UPDATED_AT_KEY, remoteData.updatedAt);
                         updateCloudStatusBadge(true, 'Sincronizado c/ Google Drive');
@@ -1835,7 +2089,9 @@
                 ['unimed_contract_schedule', unimedContractSchedule],
                 ['provisions_schedule', provisionsSchedule],
                 ['planned_payments', plannedPayments],
-                ['receivables_list', receivables]
+                ['receivables_list', receivables],
+                ['debit_notes_list', debitNotes],
+                ['account_settlement_schedule', accountSettlementSchedule]
             ]);
             updateCloudStatusBadge(true, `Salvo (CP: ${payables.length} | CR: ${receivables.length})`);
             if (pushRemote) {
@@ -1844,7 +2100,7 @@
         }
 
         async function initCloudSync() {
-            const [savedPayables, savedSettings, savedAccounts, savedBankTx, savedUnimedSchedule, savedProvisions, savedPlanned, savedReceivables] = await Promise.all([
+            const [savedPayables, savedSettings, savedAccounts, savedBankTx, savedUnimedSchedule, savedProvisions, savedPlanned, savedReceivables, savedDebitNotes, savedSettlement] = await Promise.all([
                 loadFromIndexedDB('payables_list'),
                 loadFromIndexedDB('payables_settings'),
                 loadFromIndexedDB('bank_accounts'),
@@ -1852,7 +2108,9 @@
                 loadFromIndexedDB('unimed_contract_schedule'),
                 loadFromIndexedDB('provisions_schedule'),
                 loadFromIndexedDB('planned_payments'),
-                loadFromIndexedDB('receivables_list')
+                loadFromIndexedDB('receivables_list'),
+                loadFromIndexedDB('debit_notes_list'),
+                loadFromIndexedDB('account_settlement_schedule')
             ]);
 
             if (Array.isArray(savedPayables) && savedPayables.length > 0) payables = savedPayables;
@@ -1881,6 +2139,8 @@
             }
             if (Array.isArray(savedPlanned)) plannedPayments = savedPlanned;
             if (Array.isArray(savedReceivables)) receivables = savedReceivables;
+            if (Array.isArray(savedDebitNotes)) debitNotes = savedDebitNotes;
+            if (savedSettlement && typeof savedSettlement === 'object') accountSettlementSchedule = savedSettlement;
 
             ensureThirtyDaysCutoffInit();
             ensureReceivablesCutoffInit();
@@ -1949,16 +2209,55 @@
             document.getElementById('login-screen').classList.remove('hidden');
         }
 
+        let isSidebarCollapsed = false;
+        function toggleSidebarCollapse() {
+            isSidebarCollapsed = !isSidebarCollapsed;
+            const sidebar = document.getElementById('app-sidebar');
+            const logoFull = document.getElementById('sidebar-logo-full');
+            const logoMini = document.getElementById('sidebar-logo-mini');
+            const logoHeader = document.getElementById('sidebar-logo-header');
+            const collapseIcon = document.getElementById('sidebar-collapse-icon');
+
+            if (!sidebar) return;
+
+            if (isSidebarCollapsed) {
+                sidebar.classList.remove('lg:w-64');
+                sidebar.classList.add('lg:w-16');
+                if (logoFull) logoFull.classList.add('hidden');
+                if (logoMini) logoMini.classList.remove('hidden');
+                if (logoHeader) logoHeader.classList.add('flex-col', 'py-3');
+                if (collapseIcon) collapseIcon.classList.add('rotate-180');
+            } else {
+                sidebar.classList.remove('lg:w-16');
+                sidebar.classList.add('lg:w-64');
+                if (logoFull) logoFull.classList.remove('hidden');
+                if (logoMini) logoMini.classList.add('hidden');
+                if (logoHeader) logoHeader.classList.remove('flex-col', 'py-3');
+                if (collapseIcon) collapseIcon.classList.remove('rotate-180');
+            }
+
+            sidebar.querySelectorAll('.sidebar-label, .sidebar-badge, .sidebar-section-title').forEach(el => {
+                el.classList.toggle('hidden', isSidebarCollapsed);
+            });
+
+            sidebar.querySelectorAll('nav button, .border-t button').forEach(btn => {
+                btn.classList.toggle('justify-center', isSidebarCollapsed);
+                btn.classList.toggle('px-2', isSidebarCollapsed);
+                btn.classList.toggle('px-3', !isSidebarCollapsed);
+            });
+        }
+
         function switchModule(mod) {
             activeModule = mod;
-            ['payables', 'reconciliation', 'receivables', 'cashflow'].forEach(id => {
+            ['payables', 'reconciliation', 'receivables', 'cashflow', 'debit-notes', 'account-settlement'].forEach(id => {
                 const sec = document.getElementById(`view-${id}`);
                 const btn = document.getElementById(`nav-${id}`);
                 if (sec) sec.classList.toggle('hidden', id !== mod);
                 if (btn) {
+                    const collapsedExtra = isSidebarCollapsed ? ' justify-center px-2' : ' px-3';
                     btn.className = id === mod
-                        ? 'w-full flex items-center justify-between px-3 py-2.5 text-sm font-bold rounded-xl text-left bg-emerald-50 text-unihealth-green transition-all'
-                        : 'w-full flex items-center justify-between px-3 py-2.5 text-sm rounded-xl text-left text-slate-600 hover:bg-slate-50 transition-all';
+                        ? `w-full flex items-center justify-between py-2.5 text-sm font-bold rounded-xl text-left bg-emerald-50 text-unihealth-green transition-all${collapsedExtra}`
+                        : `w-full flex items-center justify-between py-2.5 text-sm rounded-xl text-left text-slate-600 hover:bg-slate-50 transition-all${collapsedExtra}`;
                 }
             });
 
@@ -1966,7 +2265,9 @@
                 payables: ['Contas a Pagar — TOTVS Protheus (SE2)', 'Hospital Unihealth Governador Valadares • Gestão ICDS'],
                 reconciliation: ['Conciliação Bancária & Tesouraria ICDS', 'Saldos segregados: CC 0001234-3, CC 0001127-4 e CC 0001133-9'],
                 receivables: ['Contas a Receber — Cartões Cielo & Convênios', 'Recebíveis CC 0001127-4 e projeção de parcelas futuras'],
-                cashflow: ['Fluxo de Caixa Projetado (Livre das Provisões)', 'Fechamento previsto do mês operacional ICDS / Unihealth GV']
+                cashflow: ['Fluxo de Caixa Projetado (Livre das Provisões)', 'Fechamento previsto do mês operacional ICDS / Unihealth GV'],
+                'debit-notes': ['Notas de Débito — Pagamentos Diretos da Operadora', 'Duplicação por competência, conferência e validação para encontro de contas'],
+                'account-settlement': ['Encontro de Contas 2026 — Unimed GV × Unihealth', 'Apuração contábil e financeira integrada ao Contrato, Notas de Débito e Caixa']
             };
             const [t, s] = titles[mod] || titles.payables;
             document.getElementById('header-module-title').textContent = t;
@@ -1976,6 +2277,8 @@
             else if (mod === 'payables') renderPayablesTable();
             else if (mod === 'receivables') renderReceivablesModule();
             else if (mod === 'cashflow') renderCashFlowModule();
+            else if (mod === 'debit-notes') renderDebitNotesModule();
+            else if (mod === 'account-settlement') renderAccountSettlementModule();
         }
 
         function renderAllViews() {
@@ -1983,12 +2286,16 @@
             else if (activeModule === 'reconciliation') renderBankReconciliation();
             else if (activeModule === 'receivables') renderReceivablesModule();
             else if (activeModule === 'cashflow') renderCashFlowModule();
+            else if (activeModule === 'debit-notes') renderDebitNotesModule();
+            else if (activeModule === 'account-settlement') renderAccountSettlementModule();
 
             requestAnimationFrame(() => {
                 if (activeModule !== 'payables') renderPayablesTable();
                 if (activeModule !== 'reconciliation') renderBankReconciliation();
                 if (activeModule !== 'receivables') renderReceivablesModule();
                 if (activeModule !== 'cashflow') renderCashFlowModule();
+                if (activeModule !== 'debit-notes') renderDebitNotesModule();
+                if (activeModule !== 'account-settlement') renderAccountSettlementModule();
             });
         }
 
@@ -2840,6 +3147,68 @@
         // ---------------------------------------------------------
         // 7. MÓDULO 2: CONCILIAÇÃO BANCÁRIA, CONTRATO UNIMED & PROVISÕES
         // ---------------------------------------------------------
+        function getDebitNotesBudgetBreakdownByYM(ym) {
+            const [y, m] = String(ym || '').split('-');
+            const targetComp = `${m}/${y}`;
+
+            let matMedPaciente = 0;
+            let matConsumoGeral = 0;
+            let servTerceirosPJ = 0;
+            let honorariosMedicos = 0;
+            let despOperacionaisGerais = 0;
+            let despNaoOperacionais = 0;
+            let laboratory = 0;
+            let allNotesTotal = 0;
+
+            (debitNotes || []).forEach(n => {
+                if (n.competencia !== targetComp) return;
+                const val = Number(n.amount || 0);
+                allNotesTotal += val;
+                const normBudget = String(n.budget || '')
+                    .normalize('NFD')
+                    .replace(/[\u0300-\u036f]/g, '')
+                    .replace(/\s+/g, ' ')
+                    .trim()
+                    .toUpperCase();
+
+                if (normBudget.includes('LABORATORIO')) {
+                    laboratory += val;
+                } else if (normBudget === 'MATERIAIS E MEDICAMENTOS DE USO NO PACIENTE') {
+                    matMedPaciente += val;
+                } else if (normBudget === 'MATERIAIS DE CONSUMO GERAL') {
+                    matConsumoGeral += val;
+                } else if (normBudget === 'SERVICOS DE TERCEIROS - PESSOA JURIDICA') {
+                    servTerceirosPJ += val;
+                } else if (normBudget === 'HONORARIOS MEDICOS') {
+                    honorariosMedicos += val;
+                } else if (normBudget === 'DESPESAS OPERACIONAIS GERAIS') {
+                    despOperacionaisGerais += val;
+                } else if (normBudget === 'DESPESAS NAO OPERACIONAIS') {
+                    despNaoOperacionais += val;
+                }
+            });
+
+            const directExpenses =
+                matMedPaciente +
+                matConsumoGeral +
+                servTerceirosPJ +
+                honorariosMedicos +
+                despOperacionaisGerais +
+                despNaoOperacionais;
+
+            return {
+                matMedPaciente,
+                matConsumoGeral,
+                servTerceirosPJ,
+                honorariosMedicos,
+                despOperacionaisGerais,
+                despNaoOperacionais,
+                directExpenses,
+                laboratory,
+                allNotesTotal
+            };
+        }
+
         function isUnimedTransferTx(tx) {
             return tx && tx.accountId === '0001234-3' && Number(tx.credit || 0) > 0 && String(tx.description || '').toUpperCase().includes('UNIMED');
         }
@@ -2847,12 +3216,14 @@
         function getUnimedMonthSummary(ym) {
             const cfg = (unimedContractSchedule && unimedContractSchedule[ym]) || { contractValue: 0, operatorPaid: 0 };
             const contractValue = Number(cfg.contractValue || 0);
-            const operatorPaid = Number(cfg.operatorPaid || 0);
+            const ndTotals = getDebitNotesBudgetBreakdownByYM(ym);
+            // Puxa automaticamente o total das notas de débito da competência (mantém fallback manual apenas se ainda não houver notas lançadas no mês)
+            const operatorPaid = ndTotals.allNotesTotal > 0 ? ndTotals.allNotesTotal : Number(cfg.operatorPaid || 0);
             const netExpected = contractValue - operatorPaid;
             const txs = (bankTransactions || []).filter(t => isUnimedTransferTx(t) && (t.date || '').startsWith(ym));
             const receivedBank = txs.reduce((s, t) => s + Number(t.credit || 0), 0);
             const pendingReceipt = Math.max(0, netExpected - receivedBank);
-            return { ym, contractValue, operatorPaid, netExpected, receivedBank, pendingReceipt, txCount: txs.length };
+            return { ym, contractValue, operatorPaid, isAutoFromND: ndTotals.allNotesTotal > 0, netExpected, receivedBank, pendingReceipt, txCount: txs.length };
         }
 
         function getProvisionsMetrics() {
@@ -3178,7 +3549,10 @@
                             <input type="number" step="0.01" value="${info.contractValue || ''}" oninput="updateUnimedMonthDraft('${m.ym}', 'contractValue', this.value)" placeholder="0,00" class="w-full px-2.5 py-1.5 border border-slate-200 rounded-lg text-right font-semibold bg-white">
                         </td>
                         <td class="py-2 px-3">
-                            <input type="number" step="0.01" value="${info.operatorPaid || ''}" oninput="updateUnimedMonthDraft('${m.ym}', 'operatorPaid', this.value)" placeholder="0,00" class="w-full px-2.5 py-1.5 border border-slate-200 rounded-lg text-right font-semibold bg-white">
+                            <div class="relative">
+                                <input type="number" step="0.01" value="${info.operatorPaid ? Number(info.operatorPaid.toFixed(2)) : ''}" ${info.isAutoFromND ? 'readonly title="Calculado automaticamente pelo total de Notas de Débito da competência"' : `oninput="updateUnimedMonthDraft('${m.ym}', 'operatorPaid', this.value)"`} placeholder="0,00" class="w-full px-2.5 py-1.5 border border-slate-200 rounded-lg text-right font-semibold ${info.isAutoFromND ? 'bg-violet-50/70 text-violet-900 cursor-not-allowed' : 'bg-white'}">
+                                ${info.isAutoFromND ? '<span class="block text-[9px] text-right font-bold text-violet-700 mt-0.5">Auto • Notas de Débito</span>' : ''}
+                            </div>
                         </td>
                         <td id="unimed-net-${m.ym}" class="py-2 px-3 text-right font-bold text-slate-700 whitespace-nowrap">${formatCurrency(info.netExpected)}</td>
                         <td class="py-2 px-3 text-right font-bold text-unihealth-green whitespace-nowrap">${formatCurrency(info.receivedBank)}</td>
@@ -4757,6 +5131,1007 @@
             renderAllViews();
             await persistAllState(true);
             showToast('Base do Contas a Pagar zerada com sucesso!');
+        }
+
+        // ---------------------------------------------------------
+        // 12. MÓDULO 5: NOTAS DE DÉBITO (COMPETÊNCIA, "+", EDITAR, VALIDAR)
+        // ---------------------------------------------------------
+        function getCurrentSystemCompetenciaMMAAAA() {
+            const [y, m] = getTodayISODate().slice(0, 7).split('-');
+            return `${m}/${y}`;
+        }
+
+        function normalizeCompetenciaMMAAAA(raw) {
+            if (!raw) return '';
+            if (raw instanceof Date && !isNaN(raw.getTime())) {
+                return `${String(raw.getMonth() + 1).padStart(2, '0')}/${raw.getFullYear()}`;
+            }
+            const s = String(raw).trim();
+            const mSlash = s.match(/^(\d{1,2})[\/\-](\d{4})$/);
+            if (mSlash) return `${mSlash[1].padStart(2, '0')}/${mSlash[2]}`;
+            const mDashYM = s.match(/^(\d{4})[\/\-](\d{1,2})$/);
+            if (mDashYM) return `${mDashYM[2].padStart(2, '0')}/${mDashYM[1]}`;
+            const mDateBR = s.match(/^\d{1,2}[\/\-](\d{1,2})[\/\-](\d{4})/);
+            if (mDateBR) return `${mDateBR[2].padStart(2, '0')}/${mDateBR[3]}`;
+            const ptMonths = {
+                jan: '01', janeiro: '01',
+                fev: '02', fevereiro: '02',
+                mar: '03', marco: '03', março: '03',
+                abr: '04', abril: '04',
+                mai: '05', maio: '05',
+                jun: '06', junho: '06',
+                jul: '07', julho: '07',
+                ago: '08', agosto: '08',
+                set: '09', setembro: '09',
+                out: '10', outubro: '10',
+                nov: '11', novembro: '11',
+                dez: '12', dezembro: '12'
+            };
+            const normStr = s.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+            const mMonthYear = normStr.match(/([a-z]+)\s*[\/\-]?\s*(\d{4})/);
+            if (mMonthYear && ptMonths[mMonthYear[1]]) {
+                return `${ptMonths[mMonthYear[1]]}/${mMonthYear[2]}`;
+            }
+            return '';
+        }
+
+        function competenciaToSortKey(comp) {
+            const m = String(comp || '').match(/^(\d{2})\/(\d{4})$/);
+            if (!m) return '0000-00';
+            return `${m[2]}-${m[1]}`;
+        }
+
+        function getPreviousCompetenciaMMAAAA(comp) {
+            const m = String(comp || '').match(/^(\d{2})\/(\d{4})$/);
+            if (!m) return '';
+            let month = parseInt(m[1], 10);
+            let year = parseInt(m[2], 10);
+            month -= 1;
+            if (month < 1) {
+                month = 12;
+                year -= 1;
+            }
+            return `${String(month).padStart(2, '0')}/${year}`;
+        }
+
+        function cleanSupplierNameOnly(raw) {
+            let s = String(raw || '').trim();
+            if (!s) return '';
+            // Remove prefixos como "ND 2039 (NF 001022878) - " ou "ND-2039 / NF 123 - "
+            s = s.replace(/^(?:ND|N\.?D\.?)\s*[-#:]?\s*\w*(?:\s*\((?:NF|N\.?F\.?)\s*[-#:]?\s*\w*\))?\s*[-–—:|]+\s*/i, '').trim();
+            s = s.replace(/^(?:NF|N\.?F\.?)\s*[-#:]?\s*\w*\s*[-–—:|]+\s*/i, '').trim();
+            return s.toUpperCase();
+        }
+
+        function parseFlexibleMoney(raw) {
+            if (typeof raw === 'number') {
+                if (isNaN(raw)) return 0;
+                // Evita tratar números inteiros gigantes (ex.: códigos/números de NF) como valor monetário
+                if (Number.isInteger(raw) && Math.abs(raw) > 9999999) return 0;
+                return raw;
+            }
+            if (raw === null || raw === undefined || raw === '') return 0;
+            const s = String(raw).trim();
+            // Se for string puramente numérica sem separador decimal e muito longa (ex.: número de NF), ignora
+            if (/^\d{8,}$/.test(s)) return 0;
+            const direct = parseCurrencyBR(s);
+            if (direct !== 0) return direct;
+            const cleaned = s.replace(/[^\d.,-]/g, '').trim();
+            if (!cleaned) return 0;
+            if (/^\d+\.\d{1,2}$/.test(cleaned)) {
+                return parseFloat(cleaned) || 0;
+            }
+            return parseCurrencyBR(cleaned);
+        }
+
+        async function handleDebitNotesFileImport(event) {
+            const file = event.target.files && event.target.files[0];
+            if (!file) return;
+
+            try {
+                const buf = await file.arrayBuffer();
+                let wb;
+                if (file.name.toLowerCase().endsWith('.csv')) {
+                    let text = new TextDecoder('utf-8').decode(buf);
+                    if (text.includes('\uFFFD')) text = new TextDecoder('windows-1252').decode(buf);
+                    wb = XLSX.read(text, { type: 'string', raw: false });
+                } else {
+                    wb = XLSX.read(buf, { type: 'array', cellDates: true });
+                }
+
+                const imported = [];
+                for (const sheetName of wb.SheetNames) {
+                    const sheet = wb.Sheets[sheetName];
+                    if (!sheet) continue;
+                    const aoa = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: '', raw: true });
+                    if (!aoa || aoa.length === 0) continue;
+
+                    let headerIdx = -1;
+                    for (let r = 0; r < Math.min(30, aoa.length); r++) {
+                        const cols = (aoa[r] || []).map(normalizeColKey);
+                        if (cols.some(c => c.includes('fornec') || c.includes('nome') || c.includes('valor') || c.includes('comp') || c.includes('debito') || c.includes('fiscal') || c.includes('orcamento') || c.includes('especie'))) {
+                            headerIdx = r;
+                            break;
+                        }
+                    }
+
+                    const headers = headerIdx >= 0 ? (aoa[headerIdx] || []) : [];
+                    const startRow = headerIdx >= 0 ? headerIdx + 1 : 0;
+
+                    for (let r = startRow; r < aoa.length; r++) {
+                        const row = aoa[r];
+                        if (!row || row.every(c => String(c || '').trim() === '')) continue;
+
+                        const normObj = {};
+                        headers.forEach((h, idx) => {
+                            const nk = normalizeColKey(h);
+                            if (nk && (normObj[nk] === undefined || String(normObj[nk]).trim() === '')) {
+                                normObj[nk] = row[idx];
+                            }
+                        });
+
+                        const firstColRaw = row[0];
+                        let comp = normalizeCompetenciaMMAAAA(firstColRaw);
+                        if (!comp) {
+                            const compFromCol = pickColumnValue(normObj, ['competencia', 'comp', 'mesano', 'mes', 'data', 'emissao'], ['comp', 'mes', 'data']);
+                            comp = normalizeCompetenciaMMAAAA(compFromCol);
+                        }
+                        if (!comp) {
+                            for (let cIdx = 0; cIdx < row.length; cIdx++) {
+                                const cNorm = normalizeCompetenciaMMAAAA(row[cIdx]);
+                                if (cNorm) {
+                                    comp = cNorm;
+                                    break;
+                                }
+                            }
+                        }
+
+                        const debitNoteNum = String(pickColumnValue(normObj, ['notadedebito', 'notadebito', 'nd', 'numerond', 'numnd', 'nrnd'], ['notadedeb', 'notadeb', 'numerond', 'nrnd']) || '').trim();
+                        const invoiceNum = String(pickColumnValue(normObj, ['notafiscal', 'nf', 'numnf', 'numeronf', 'nrfiscal', 'nota'], ['notafisc', 'numnf', 'numeronf', 'nrfisc']) || '').trim();
+                        const origin = String(pickColumnValue(normObj, ['origem', 'orig', 'fonte'], ['orig']) || '').trim();
+                        const budget = String(pickColumnValue(normObj, ['orcamento', 'orc', 'ccusto', 'centrocusto'], ['orcam', 'ccusto']) || '').trim();
+                        const species = String(pickColumnValue(normObj, ['especie', 'esp', 'tipo'], ['espec', 'tipo']) || '').trim();
+                        const rawSupplier = String(pickColumnValue(normObj, ['fornecedor', 'nomefornecedor', 'fornec', 'nome', 'prestador', 'favorecido'], ['fornec', 'prest', 'nome']) || '').trim();
+
+                        let amount = Math.abs(parseFlexibleMoney(pickColumnValue(normObj, ['valor', 'vlr', 'valornd', 'valordebito', 'valorbruto', 'valorliquido', 'total'], ['valor', 'vlr'])));
+                        if (amount === 0) {
+                            // Procura apenas valores formatados com vírgula/decimal ou números decimais plausíveis (nunca inteiros longos de NF)
+                            for (let cIdx = 1; cIdx < row.length; cIdx++) {
+                                const hNorm = normalizeColKey(headers[cIdx] || '');
+                                if (hNorm.includes('nota') || hNorm.includes('fiscal') || hNorm.includes('debito') || hNorm.includes('numero') || hNorm.includes('num') || hNorm.includes('cod') || hNorm.includes('id')) {
+                                    continue;
+                                }
+                                const v = row[cIdx];
+                                if (typeof v === 'number' && !isNaN(v) && !Number.isInteger(v) && Math.abs(v) > 0 && !(v > 20000 && v < 80000)) {
+                                    amount = Math.abs(Number(v.toFixed(2)));
+                                    break;
+                                }
+                                if (typeof v === 'string' && /R\$\s*[\d.,]+|[\d.]+,\d{2}/.test(v)) {
+                                    const parsedStr = Math.abs(parseFlexibleMoney(v));
+                                    if (parsedStr > 0) {
+                                        amount = parsedStr;
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+
+                        let fallbackSupplier = rawSupplier;
+                        if (!fallbackSupplier && headers.length === 0) {
+                            const textCols = row.filter(cell => typeof cell === 'string' && /[a-zA-ZÀ-ÿ]{3,}/.test(cell) && !normalizeCompetenciaMMAAAA(cell));
+                            if (textCols.length > 0) {
+                                fallbackSupplier = textCols[textCols.length - 1];
+                            }
+                        }
+
+                        const supplier = cleanSupplierNameOnly(fallbackSupplier);
+                        if (!supplier || /^(historico|fornecedor|competencia|total\s+geral|subtotal)/i.test(supplier)) continue;
+                        if (!debitNoteNum && !invoiceNum && amount === 0) continue;
+
+                        imported.push({
+                            id: `ND-IMP-${Date.now()}-${r}-${Math.random().toString(36).slice(2, 6)}`,
+                            competencia: comp || '10/2026',
+                            debitNoteNumber: debitNoteNum,
+                            invoiceNumber: invoiceNum,
+                            supplier,
+                            origin,
+                            budget,
+                            species,
+                            amount,
+                            status: 'Pendente'
+                        });
+                    }
+                }
+
+                event.target.value = '';
+                if (imported.length === 0) {
+                    showToast('Nenhuma Nota de Débito encontrada na planilha.');
+                    return;
+                }
+
+                debitNotes = debitNotes.concat(imported);
+                renderDebitNotesModule();
+                await persistAllState(true);
+                showToast(`${imported.length} Nota(s) de Débito importada(s) com sucesso!`);
+            } catch (err) {
+                event.target.value = '';
+                showToast('Erro ao importar planilha de Notas de Débito.');
+            }
+        }
+
+        function openNewCompetenciaDebitNotesModal() {
+            const suggestedTarget = getCurrentSystemCompetenciaMMAAAA();
+            const prevComp = getPreviousCompetenciaMMAAAA(suggestedTarget);
+            const prevItems = debitNotes.filter(n => n.competencia === prevComp);
+            const prevSum = prevItems.reduce((s, n) => s + Number(n.amount || 0), 0);
+
+            document.getElementById('nd-target-comp-input').value = suggestedTarget;
+            document.getElementById('nd-prev-comp-preview').textContent = prevItems.length > 0
+                ? `Mês anterior (${prevComp}): ${prevItems.length} lançamento(s) somando ${formatCurrency(prevSum)} serão replicados para ${suggestedTarget} com o Nº da Nota em branco para inserção manual.`
+                : `Nenhum lançamento encontrado no mês anterior (${prevComp || 'N/A'}). Verifique se o mês anterior está lançado antes de gerar ${suggestedTarget}.`;
+
+            const m = document.getElementById('nd-new-competencia-modal');
+            m.classList.remove('hidden');
+            m.classList.add('flex');
+        }
+
+        function closeNewCompetenciaDebitNotesModal() {
+            const m = document.getElementById('nd-new-competencia-modal');
+            m.classList.add('hidden');
+            m.classList.remove('flex');
+        }
+
+        async function confirmNewCompetenciaDebitNotes(e) {
+            e.preventDefault();
+            const targetComp = normalizeCompetenciaMMAAAA(document.getElementById('nd-target-comp-input').value);
+            if (!/^\d{2}\/\d{4}$/.test(targetComp)) return;
+
+            const result = replicateDebitNotesFromPreviousCompetencia(targetComp);
+            closeNewCompetenciaDebitNotesModal();
+            const selComp = document.getElementById('nd-filter-competencia');
+            if (selComp) selComp.value = targetComp;
+            renderDebitNotesModule();
+            await persistAllState(true);
+            showToast(`${result.createdCount} lançamento(s) de ${result.prevComp} replicado(s) para ${targetComp} (ND e NF em branco)!`);
+        }
+
+        function replicateDebitNotesFromPreviousCompetencia(targetComp) {
+            const prevComp = getPreviousCompetenciaMMAAAA(targetComp);
+            const sourceItems = debitNotes.filter(n => n.competencia === prevComp);
+
+            const existingTargetKeys = new Set(
+                debitNotes
+                    .filter(n => n.competencia === targetComp)
+                    .map(n => `${String(n.supplier || '').trim().toUpperCase()}|${String(n.origin || '').trim().toUpperCase()}|${String(n.budget || '').trim().toUpperCase()}|${String(n.species || '').trim().toUpperCase()}|${Number(n.amount || 0).toFixed(2)}`)
+            );
+
+            let createdCount = 0;
+            sourceItems.forEach((src, idx) => {
+                const key = `${String(src.supplier || '').trim().toUpperCase()}|${String(src.origin || '').trim().toUpperCase()}|${String(src.budget || '').trim().toUpperCase()}|${String(src.species || '').trim().toUpperCase()}|${Number(src.amount || 0).toFixed(2)}`;
+                if (existingTargetKeys.has(key)) return;
+                debitNotes.push({
+                    id: `ND-${Date.now()}-${idx}-${Math.random().toString(36).slice(2, 6)}`,
+                    competencia: targetComp,
+                    debitNoteNumber: '',
+                    invoiceNumber: '',
+                    supplier: src.supplier,
+                    origin: src.origin || '',
+                    budget: src.budget || '',
+                    species: src.species || '',
+                    amount: Number(src.amount || 0),
+                    status: 'Pendente'
+                });
+                existingTargetKeys.add(key);
+                createdCount++;
+            });
+
+            return { prevComp, createdCount, sourceCount: sourceItems.length };
+        }
+
+        async function duplicatePreviousFromQuickCompetencia() {
+            const rawInput = document.getElementById('nd-quick-target-comp')?.value || '';
+            const targetComp = normalizeCompetenciaMMAAAA(rawInput);
+            if (!/^\d{2}\/\d{4}$/.test(targetComp)) {
+                showToast('Informe a Competência de Destino no formato MM/AAAA (ex.: 11/2026).');
+                return;
+            }
+            const result = replicateDebitNotesFromPreviousCompetencia(targetComp);
+            if (result.sourceCount === 0) {
+                showToast(`Não há lançamentos na competência anterior (${result.prevComp}) para duplicar em ${targetComp}.`);
+                return;
+            }
+            renderDebitNotesModule();
+            await persistAllState(true);
+            showToast(`${result.createdCount} lançamento(s) de ${result.prevComp} duplicado(s) para ${targetComp} (ND e NF em branco)!`);
+        }
+
+        async function duplicateDebitNoteToTargetCompetencia(noteId) {
+            const note = debitNotes.find(n => n.id === noteId);
+            if (!note) return;
+
+            const quickInput = document.getElementById('nd-quick-target-comp');
+            const filterComp = document.getElementById('nd-filter-competencia')?.value;
+            let rawTarget = (quickInput && quickInput.value.trim())
+                || (filterComp && filterComp !== 'all' ? filterComp : '')
+                || getCurrentSystemCompetenciaMMAAAA();
+
+            const targetComp = normalizeCompetenciaMMAAAA(rawTarget);
+            if (!/^\d{2}\/\d{4}$/.test(targetComp)) {
+                showToast('Informe uma competência válida no formato MM/AAAA.');
+                return;
+            }
+
+            const clone = {
+                id: `ND-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
+                competencia: targetComp,
+                debitNoteNumber: '',
+                invoiceNumber: '',
+                supplier: note.supplier,
+                origin: note.origin || '',
+                budget: note.budget || '',
+                species: note.species || '',
+                amount: Number(note.amount || 0),
+                status: 'Pendente'
+            };
+
+            debitNotes.unshift(clone);
+            renderDebitNotesModule();
+            await persistAllState(true);
+            showToast(`Duplicado "${note.supplier}" para ${targetComp} (ND e NF em branco)!`);
+        }
+
+        function openNewDebitNoteModal() {
+            const filterComp = document.getElementById('nd-filter-competencia')?.value;
+            const defaultComp = (filterComp && filterComp !== 'all')
+                ? filterComp
+                : (document.getElementById('nd-quick-target-comp')?.value.trim() || getCurrentSystemCompetenciaMMAAAA());
+
+            document.getElementById('nd-edit-modal-title').textContent = 'Nova Nota de Débito';
+            document.getElementById('nd-edit-id').value = '';
+            document.getElementById('nd-edit-comp').value = normalizeCompetenciaMMAAAA(defaultComp);
+            document.getElementById('nd-edit-nd').value = '';
+            document.getElementById('nd-edit-nf').value = '';
+            document.getElementById('nd-edit-supplier').value = '';
+            document.getElementById('nd-edit-origin').value = '';
+            document.getElementById('nd-edit-budget').value = '';
+            document.getElementById('nd-edit-species').value = '';
+            document.getElementById('nd-edit-amount').value = '';
+            document.getElementById('nd-edit-status').value = 'Pendente';
+
+            const m = document.getElementById('nd-edit-modal');
+            m.classList.remove('hidden');
+            m.classList.add('flex');
+        }
+
+        function openEditDebitNoteModal(noteId) {
+            const note = debitNotes.find(n => n.id === noteId);
+            if (!note) return;
+
+            document.getElementById('nd-edit-modal-title').textContent = 'Editar Nota de Débito';
+            document.getElementById('nd-edit-id').value = note.id;
+            document.getElementById('nd-edit-comp').value = note.competencia || '';
+            document.getElementById('nd-edit-nd').value = note.debitNoteNumber || '';
+            document.getElementById('nd-edit-nf').value = note.invoiceNumber || '';
+            document.getElementById('nd-edit-supplier').value = cleanSupplierNameOnly(note.supplier || '');
+            document.getElementById('nd-edit-origin').value = note.origin || '';
+            document.getElementById('nd-edit-budget').value = note.budget || '';
+            document.getElementById('nd-edit-species').value = note.species || '';
+            document.getElementById('nd-edit-amount').value = Number(note.amount || 0);
+            document.getElementById('nd-edit-status').value = note.status === 'Validado' ? 'Validado' : 'Pendente';
+
+            const m = document.getElementById('nd-edit-modal');
+            m.classList.remove('hidden');
+            m.classList.add('flex');
+        }
+
+        function closeDebitNoteEditModal() {
+            const m = document.getElementById('nd-edit-modal');
+            m.classList.add('hidden');
+            m.classList.remove('flex');
+        }
+
+        async function saveDebitNoteForm(e) {
+            e.preventDefault();
+            const id = document.getElementById('nd-edit-id').value;
+            const comp = normalizeCompetenciaMMAAAA(document.getElementById('nd-edit-comp').value);
+            const debitNoteNumber = document.getElementById('nd-edit-nd').value.trim();
+            const invoiceNumber = document.getElementById('nd-edit-nf').value.trim();
+            const supplier = cleanSupplierNameOnly(document.getElementById('nd-edit-supplier').value);
+            const origin = document.getElementById('nd-edit-origin').value.trim();
+            const budget = document.getElementById('nd-edit-budget').value.trim();
+            const species = document.getElementById('nd-edit-species').value.trim();
+            const amount = parseFloat(document.getElementById('nd-edit-amount').value) || 0;
+            const status = document.getElementById('nd-edit-status').value === 'Validado' ? 'Validado' : 'Pendente';
+
+            if (id) {
+                const existing = debitNotes.find(n => n.id === id);
+                if (existing) {
+                    existing.competencia = comp;
+                    existing.debitNoteNumber = debitNoteNumber;
+                    existing.invoiceNumber = invoiceNumber;
+                    existing.supplier = supplier;
+                    existing.origin = origin;
+                    existing.budget = budget;
+                    existing.species = species;
+                    existing.amount = amount;
+                    existing.status = status;
+                }
+            } else {
+                debitNotes.unshift({
+                    id: `ND-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
+                    competencia: comp,
+                    debitNoteNumber,
+                    invoiceNumber,
+                    supplier,
+                    origin,
+                    budget,
+                    species,
+                    amount,
+                    status
+                });
+            }
+
+            closeDebitNoteEditModal();
+            renderDebitNotesModule();
+            await persistAllState(true);
+            showToast('Nota de Débito salva com sucesso!');
+        }
+
+        async function validateDebitNote(noteId) {
+            const note = debitNotes.find(n => n.id === noteId);
+            if (!note) return;
+            note.status = note.status === 'Validado' ? 'Pendente' : 'Validado';
+            renderDebitNotesModule();
+            await persistAllState(true);
+            showToast(note.status === 'Validado' ? 'Nota de Débito validada!' : 'Validação revertida para Pendente.');
+        }
+
+        async function deleteDebitNote(noteId) {
+            debitNotes = debitNotes.filter(n => n.id !== noteId);
+            renderAllViews();
+            await persistAllState(true);
+            showToast('Nota de Débito excluída!');
+        }
+
+        function toggleDebitNoteSort(key) {
+            if (debitNoteSort.key === key) {
+                debitNoteSort.dir = debitNoteSort.dir === 'asc' ? 'desc' : 'asc';
+            } else {
+                debitNoteSort.key = key;
+                debitNoteSort.dir = key === 'amount' ? 'desc' : 'asc';
+            }
+            ['competencia', 'debitNoteNumber', 'invoiceNumber', 'supplier', 'origin', 'budget', 'species', 'amount', 'status'].forEach(k => {
+                const el = document.getElementById(`nd-sort-ind-${k}`);
+                if (el) el.textContent = debitNoteSort.key === k ? (debitNoteSort.dir === 'asc' ? '▲' : '▼') : '';
+            });
+            renderDebitNotesModule();
+        }
+
+        function getFilteredAndSortedDebitNotes() {
+            const activeCompFilter = document.getElementById('nd-filter-competencia')?.value || 'all';
+            const statusFilter = document.getElementById('nd-filter-status')?.value || 'all';
+            const budgetFilter = document.getElementById('nd-filter-budget')?.value || 'all';
+            const qSearch = (document.getElementById('nd-filter-search')?.value || '').trim().toLowerCase();
+
+            const filtered = debitNotes.filter(n => {
+                if (activeCompFilter !== 'all' && n.competencia !== activeCompFilter) return false;
+                if (statusFilter !== 'all' && (n.status || 'Pendente') !== statusFilter) return false;
+                if (budgetFilter !== 'all' && (n.budget || '').trim() !== budgetFilter) return false;
+                if (qSearch) {
+                    const hay = `${n.competencia || ''} ${n.debitNoteNumber || ''} ${n.invoiceNumber || ''} ${n.supplier || ''} ${n.origin || ''} ${n.budget || ''} ${n.species || ''}`.toLowerCase();
+                    if (!hay.includes(qSearch)) return false;
+                }
+                return true;
+            });
+
+            const mult = debitNoteSort.dir === 'asc' ? 1 : -1;
+            const sKey = debitNoteSort.key || 'competencia';
+
+            filtered.sort((a, b) => {
+                if (sKey === 'competencia') {
+                    return competenciaToSortKey(a.competencia).localeCompare(competenciaToSortKey(b.competencia)) * mult ||
+                        String(a.supplier || '').localeCompare(String(b.supplier || ''), 'pt-BR');
+                }
+                if (sKey === 'amount') {
+                    return (Number(a.amount || 0) - Number(b.amount || 0)) * mult;
+                }
+                if (sKey === 'debitNoteNumber' || sKey === 'invoiceNumber') {
+                    const na = parseFloat(String(a[sKey] || '').replace(/\D/g, ''));
+                    const nb = parseFloat(String(b[sKey] || '').replace(/\D/g, ''));
+                    if (!isNaN(na) && !isNaN(nb) && na !== nb) {
+                        return (na - nb) * mult;
+                    }
+                }
+                return String(a[sKey] || '').localeCompare(String(b[sKey] || ''), 'pt-BR', { numeric: true }) * mult;
+            });
+
+            return filtered;
+        }
+
+        function exportDebitNotesExcel() {
+            const rowsData = getFilteredAndSortedDebitNotes();
+            if (rowsData.length === 0) {
+                showToast('Nenhuma Nota de Débito para exportar nos filtros atuais.');
+                return;
+            }
+            const sheetRows = rowsData.map(n => ({
+                'Competência': n.competencia || '',
+                'ND': n.debitNoteNumber || '',
+                'Nota Fiscal': n.invoiceNumber || '',
+                'Fornecedor': n.supplier || '',
+                'Origem': n.origin || '',
+                'Orçamento': n.budget || '',
+                'Espécie': n.species || '',
+                'Valor (R$)': Number(n.amount || 0),
+                'Status': n.status || 'Pendente'
+            }));
+            const ws = XLSX.utils.json_to_sheet(sheetRows);
+            ws['!cols'] = [
+                { wch: 13 }, { wch: 12 }, { wch: 15 }, { wch: 36 },
+                { wch: 14 }, { wch: 38 }, { wch: 28 }, { wch: 16 }, { wch: 14 }
+            ];
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, 'Notas_de_Debito');
+            XLSX.writeFile(wb, `Notas_de_Debito_Unihealth_${getTodayISODate()}.xlsx`);
+            showToast(`Planilha Excel exportada com ${rowsData.length} Nota(s) de Débito!`);
+        }
+
+        function renderDebitNotesModule() {
+            const tbody = document.getElementById('nd-tbody');
+            if (!tbody) return;
+
+            const currentComp = getCurrentSystemCompetenciaMMAAAA();
+            const compSelect = document.getElementById('nd-filter-competencia');
+            const prevSelectedComp = compSelect ? compSelect.value : 'all';
+            const budgetSelect = document.getElementById('nd-filter-budget');
+            const prevSelectedBudget = budgetSelect ? budgetSelect.value : 'all';
+
+            const compSet = new Set();
+            const budgetSet = new Set([
+                'MATERIAIS E MEDICAMENTOS DE USO NO PACIENTE',
+                'MATERIAIS DE CONSUMO GERAL',
+                'SERVIÇOS DE TERCEIROS - PESSOA JURÍDICA',
+                'HONORÁRIOS MÉDICOS',
+                'DESPESAS OPERACIONAIS GERAIS',
+                'DESPESAS NÃO OPERACIONAIS'
+            ]);
+            let currentMonthTotal = 0;
+            let currentMonthCount = 0;
+
+            for (let i = 0; i < debitNotes.length; i++) {
+                const n = debitNotes[i];
+                if (n.competencia) compSet.add(n.competencia);
+                if (n.budget && String(n.budget).trim() !== '') budgetSet.add(String(n.budget).trim());
+                if (n.competencia === currentComp) {
+                    currentMonthTotal += Number(n.amount || 0);
+                    currentMonthCount++;
+                }
+            }
+
+            if (compSelect) {
+                const sortedComps = Array.from(compSet).sort((a, b) =>
+                    competenciaToSortKey(a).localeCompare(competenciaToSortKey(b))
+                );
+                compSelect.innerHTML = `<option value="all">Todas as Competências</option>` +
+                    sortedComps.map(c => `<option value="${escapeHTML(c)}">${escapeHTML(c)}</option>`).join('');
+                if (prevSelectedComp !== 'all' && compSet.has(prevSelectedComp)) {
+                    compSelect.value = prevSelectedComp;
+                } else {
+                    compSelect.value = 'all';
+                }
+            }
+
+            if (budgetSelect) {
+                const sortedBudgets = Array.from(budgetSet).sort((a, b) => a.localeCompare(b, 'pt-BR'));
+                budgetSelect.innerHTML = `<option value="all">Todos os Orçamentos</option>` +
+                    sortedBudgets.map(b => `<option value="${escapeHTML(b)}">${escapeHTML(b)}</option>`).join('');
+                if (prevSelectedBudget !== 'all' && budgetSet.has(prevSelectedBudget)) {
+                    budgetSelect.value = prevSelectedBudget;
+                } else {
+                    budgetSelect.value = 'all';
+                }
+            }
+
+            const filtered = getFilteredAndSortedDebitNotes();
+            const countLabel = document.getElementById('nd-count-label');
+            if (countLabel) countLabel.textContent = `${filtered.length} lançamento(s)`;
+
+            if (filtered.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="10" class="py-8 text-center text-slate-400">Nenhuma Nota de Débito encontrada para os filtros atuais.</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = filtered.map(n => {
+                const safeId = escapeHTML(n.id);
+                const isVal = n.status === 'Validado';
+                return `
+                    <tr class="hover:bg-slate-50 transition-colors">
+                        <td class="py-2 px-2 whitespace-nowrap font-bold text-violet-800">${escapeHTML(n.competencia || '-')}</td>
+                        <td class="py-2 px-1.5 whitespace-nowrap font-semibold text-slate-700">${escapeHTML(n.debitNoteNumber || '-')}</td>
+                        <td class="py-2 px-1.5 whitespace-nowrap text-slate-600">${escapeHTML(n.invoiceNumber || '-')}</td>
+                        <td class="py-2 px-2 font-bold text-slate-800 max-w-[230px] truncate" title="${escapeHTML(n.supplier || '')}">
+                            <div class="flex items-center gap-1.5">
+                                <button type="button" onclick="duplicateDebitNoteToTargetCompetencia('${safeId}')" title="Duplicar fornecedor para competência de destino" class="w-5 h-5 rounded-md bg-violet-100 hover:bg-violet-700 text-violet-800 hover:text-white font-extrabold flex items-center justify-center shrink-0 transition-all">+</button>
+                                <span class="truncate">${escapeHTML(n.supplier || '-')}</span>
+                            </div>
+                        </td>
+                        <td class="py-2 px-1.5 whitespace-nowrap text-slate-600">${escapeHTML(n.origin || '-')}</td>
+                        <td class="py-2 px-1.5 text-slate-600 max-w-[175px] truncate" title="${escapeHTML(n.budget || '')}">${escapeHTML(n.budget || '-')}</td>
+                        <td class="py-2 px-1.5 text-slate-600 max-w-[140px] truncate" title="${escapeHTML(n.species || '')}">${escapeHTML(n.species || '-')}</td>
+                        <td class="py-2 px-2 text-right whitespace-nowrap font-extrabold text-slate-900">${formatCurrency(n.amount)}</td>
+                        <td class="py-2 px-2 text-center whitespace-nowrap">
+                            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${isVal ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-800'}">
+                                ${escapeHTML(isVal ? 'Validado' : 'Pendente')}
+                            </span>
+                        </td>
+                        <td class="py-2 px-2 text-center whitespace-nowrap">
+                            <div class="inline-flex items-center gap-1">
+                                <button type="button" onclick="validateDebitNote('${safeId}')" class="px-2 py-0.5 text-[10px] font-bold rounded-md transition-all ${isVal ? 'bg-slate-100 text-slate-600 hover:bg-amber-100 hover:text-amber-800' : 'bg-emerald-50 text-unihealth-green hover:bg-unihealth-green hover:text-white'}">
+                                    ${isVal ? 'Reabrir' : 'Validar'}
+                                </button>
+                                <button type="button" onclick="openEditDebitNoteModal('${safeId}')" title="Editar nota" class="p-1 text-slate-500 hover:text-unihealth-green hover:bg-emerald-50 rounded-md">
+                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
+                                </button>
+                                <button type="button" onclick="deleteDebitNote('${safeId}')" title="Excluir nota" class="p-1 text-rose-500 hover:text-rose-700 hover:bg-rose-50 rounded-md">
+                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        // ---------------------------------------------------------
+        // 13. MÓDULO 6: ENCONTRO DE CONTAS 2026 (INTEGRADO)
+        // ---------------------------------------------------------
+        const ES_MANUAL_FIELDS = [
+            'notaFiscalEmitida',
+            'receitaParticularConvenios',
+            'reembolsoVariavelHonorario',
+            'reembolsoCai',
+            'reembolsoBancoHoras',
+            'reembolsoFerias',
+            'reembolsoRescisao',
+            'resultadoFinal2025',
+            'excedentesProducao'
+        ];
+
+        function getAccountSettlementMonthEntry(ym) {
+            if (!accountSettlementSchedule[ym]) {
+                accountSettlementSchedule[ym] = {
+                    notaFiscalEmitida: 0,
+                    receitaParticularConvenios: 0,
+                    reembolsoVariavelHonorario: 0,
+                    reembolsoCai: 0,
+                    reembolsoBancoHoras: 0,
+                    reembolsoFerias: 0,
+                    reembolsoRescisao: 0,
+                    resultadoFinal2025: 0,
+                    excedentesProducao: 0
+                };
+            }
+            return accountSettlementSchedule[ym];
+        }
+
+        function computeAccountSettlementMonth(ym) {
+            const unimed = getUnimedMonthSummary(ym);
+            const nd = getDebitNotesBudgetBreakdownByYM(ym);
+            const manual = getAccountSettlementMonthEntry(ym);
+
+            const receitaContrato = Number(unimed.contractValue || 0);
+            const matMedPaciente = Number(nd.matMedPaciente || 0);
+            const matConsumoGeral = Number(nd.matConsumoGeral || 0);
+            const servTerceirosPJ = Number(nd.servTerceirosPJ || 0);
+            const honorariosMedicos = Number(nd.honorariosMedicos || 0);
+            const despOperacionaisGerais = Number(nd.despOperacionaisGerais || 0);
+            const despNaoOperacionais = Number(nd.despNaoOperacionais || 0);
+            const despesasPagtoDireto = Number(nd.directExpenses || 0);
+            const saldo = despesasPagtoDireto - receitaContrato;
+
+            const notaFiscalEmitida = Number(manual.notaFiscalEmitida || 0);
+            // SALDO (negativo) + NOTA FISCAL EMITIDA (positivo)
+            const diferencaReceitaNF = saldo + notaFiscalEmitida;
+
+            const laboratorio = Number(nd.laboratory || 0);
+            const receitaParticularConvenios = Number(manual.receitaParticularConvenios || 0);
+
+            const resultadoContabilOperadora = diferencaReceitaNF + laboratorio + receitaParticularConvenios;
+
+            const reembolsoVariavelHonorario = Number(manual.reembolsoVariavelHonorario || 0);
+            const reembolsoCai = Number(manual.reembolsoCai || 0);
+            const reembolsoBancoHoras = Number(manual.reembolsoBancoHoras || 0);
+            const reembolsoFerias = Number(manual.reembolsoFerias || 0);
+            const reembolsoRescisao = Number(manual.reembolsoRescisao || 0);
+            const resultadoFinal2025 = Number(manual.resultadoFinal2025 || 0);
+
+            const saldoFinanceiroReceber =
+                (receitaContrato - despesasPagtoDireto) -
+                laboratorio -
+                receitaParticularConvenios +
+                reembolsoVariavelHonorario +
+                reembolsoCai +
+                reembolsoBancoHoras +
+                reembolsoFerias +
+                reembolsoRescisao +
+                resultadoFinal2025;
+
+            const repasseUnimedUnihealth = Object.prototype.hasOwnProperty.call(ES_FIXED_REPASSE_UNIMED_2026, ym)
+                ? ES_FIXED_REPASSE_UNIMED_2026[ym]
+                : Number(unimed.receivedBank || 0);
+            const saldoReceberFluxoCaixa = saldoFinanceiroReceber - repasseUnimedUnihealth;
+
+            const excedentesProducao = Number(manual.excedentesProducao || 0);
+            const resultadoFinanceiroFluxoCaixa = saldoReceberFluxoCaixa + excedentesProducao;
+
+            return {
+                ym,
+                receitaContrato,
+                despesasPagtoDireto,
+                matMedPaciente,
+                matConsumoGeral,
+                servTerceirosPJ,
+                honorariosMedicos,
+                despOperacionaisGerais,
+                despNaoOperacionais,
+                saldo,
+                notaFiscalEmitida,
+                diferencaReceitaNF,
+                laboratorio,
+                receitaParticularConvenios,
+                resultadoContabilOperadora,
+                reembolsoVariavelHonorario,
+                reembolsoCai,
+                reembolsoBancoHoras,
+                reembolsoFerias,
+                reembolsoRescisao,
+                resultadoFinal2025,
+                saldoFinanceiroReceber,
+                repasseUnimedUnihealth,
+                saldoReceberFluxoCaixa,
+                excedentesProducao,
+                resultadoFinanceiroFluxoCaixa
+            };
+        }
+
+        function formatMatrixMoney(val) {
+            const num = Number(val || 0);
+            if (Math.abs(num) < 0.005) return '0,00';
+            return num.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        }
+
+        function toggleAccountSettlementMonth(ym) {
+            const activeCount = UNIMED_12_MONTHS.filter(m => esVisibleMonths[m.ym]).length;
+            if (esVisibleMonths[ym] && activeCount <= 1) {
+                showToast('Mantenha pelo menos um mês selecionado.');
+                return;
+            }
+            esVisibleMonths[ym] = !esVisibleMonths[ym];
+            renderAccountSettlementModule();
+        }
+
+        function setAccountSettlementMonthsPreset(preset) {
+            UNIMED_12_MONTHS.forEach((m, idx) => {
+                esVisibleMonths[m.ym] = preset === 'all' ? true : idx <= 9;
+            });
+            renderAccountSettlementModule();
+        }
+
+        function updateAccountSettlementField(ym, field, rawVal) {
+            const entry = getAccountSettlementMonthEntry(ym);
+            entry[field] = parseFloat(rawVal) || 0;
+            renderAccountSettlementModule(true);
+            scheduleCloudPush(false);
+        }
+
+        async function saveAccountSettlementManualChanges() {
+            renderAllViews();
+            await persistAllState(true);
+            showToast('Encontro de Contas 2026 salvo e sincronizado com o Google Drive!');
+        }
+
+        const ES_ROW_DEFINITIONS = [
+            { key: 'receitaContrato', label: 'RECEITA - CONTRATO', sign: '(+)', rowClass: 'bg-emerald-50/80 font-extrabold text-unihealth-greenDark', stickyBg: 'bg-emerald-50', type: 'auto' },
+            { key: 'despesasPagtoDireto', label: 'DESPESAS (PAGTO DIRETO UNIMED)', sign: '(-)', rowClass: 'bg-slate-100/90 font-extrabold text-slate-900', stickyBg: 'bg-slate-100', type: 'auto' },
+            { key: 'matMedPaciente', label: '↳ MAT. E MED. DE USO NO PACIENTE', sign: '•', rowClass: 'bg-white text-[9.5px] font-medium text-slate-600', stickyBg: 'bg-white', type: 'sub' },
+            { key: 'matConsumoGeral', label: '↳ MATERIAIS DE CONSUMO GERAL', sign: '•', rowClass: 'bg-white text-[9.5px] font-medium text-slate-600', stickyBg: 'bg-white', type: 'sub' },
+            { key: 'servTerceirosPJ', label: '↳ SERVIÇOS DE TERCEIROS - PJ', sign: '•', rowClass: 'bg-white text-[9.5px] font-medium text-slate-600', stickyBg: 'bg-white', type: 'sub' },
+            { key: 'honorariosMedicos', label: '↳ HONORÁRIOS MÉDICOS', sign: '•', rowClass: 'bg-white text-[9.5px] font-medium text-slate-600', stickyBg: 'bg-white', type: 'sub' },
+            { key: 'despOperacionaisGerais', label: '↳ DESPESAS OPERACIONAIS GERAIS', sign: '•', rowClass: 'bg-white text-[9.5px] font-medium text-slate-600', stickyBg: 'bg-white', type: 'sub' },
+            { key: 'despNaoOperacionais', label: '↳ DESPESAS NÃO OPERACIONAIS', sign: '•', rowClass: 'bg-white text-[9.5px] font-medium text-slate-600', stickyBg: 'bg-white', type: 'sub' },
+            { key: 'saldo', label: 'SALDO', sign: '=', rowClass: 'bg-slate-100 font-extrabold text-slate-900', stickyBg: 'bg-slate-100', type: 'formula' },
+            { key: 'notaFiscalEmitida', label: 'NOTA FISCAL EMITIDA', sign: '(-)', rowClass: 'bg-white font-semibold text-slate-800', stickyBg: 'bg-white', type: 'manual' },
+            { key: 'diferencaReceitaNF', label: 'DIFERENÇA RECEITA - NOTA FISCAL', sign: '=', rowClass: 'bg-slate-50 font-bold text-slate-800', stickyBg: 'bg-slate-50', type: 'formula' },
+            { key: 'laboratorio', label: 'LABORATÓRIO', sign: '(+)', rowClass: 'bg-white font-semibold text-slate-700', stickyBg: 'bg-white', type: 'auto' },
+            { key: 'receitaParticularConvenios', label: 'RECEITA PARTICULAR / CONVÊNIOS', sign: '(+)', rowClass: 'bg-white font-semibold text-slate-600', stickyBg: 'bg-white', type: 'manual' },
+            { key: 'resultadoContabilOperadora', label: 'RESULTADO CONTÁBIL VISÃO OPERADORA', sign: '=', rowClass: 'bg-lime-200/80 font-extrabold text-slate-900', stickyBg: 'bg-lime-200', type: 'highlight' },
+            { key: 'reembolsoVariavelHonorario', label: 'REEMBOLSO VARIÁVEL HON. MÉDICO', sign: '(+)', rowClass: 'bg-white font-semibold text-slate-700', stickyBg: 'bg-white', type: 'manual' },
+            { key: 'reembolsoCai', label: 'REEMBOLSO CAI', sign: '(+)', rowClass: 'bg-white font-semibold text-slate-700', stickyBg: 'bg-white', type: 'manual' },
+            { key: 'reembolsoBancoHoras', label: 'REEMBOLSO BANCO DE HORAS', sign: '(+)', rowClass: 'bg-white font-semibold text-slate-700', stickyBg: 'bg-white', type: 'manual' },
+            { key: 'reembolsoFerias', label: 'REEMBOLSO FÉRIAS (EXTRA ORÇ.)', sign: '(+)', rowClass: 'bg-white font-semibold text-slate-700', stickyBg: 'bg-white', type: 'manual' },
+            { key: 'reembolsoRescisao', label: 'REEMBOLSO RESCISÃO (EXTRA ORÇ.)', sign: '(+)', rowClass: 'bg-white font-semibold text-slate-700', stickyBg: 'bg-white', type: 'manual' },
+            { key: 'resultadoFinal2025', label: 'RESULTADO FINAL 2025 (10/06/2026)', sign: '(+)', rowClass: 'bg-white font-semibold text-slate-700', stickyBg: 'bg-white', type: 'manual' },
+            { key: 'saldoFinanceiroReceber', label: 'SALDO FINANCEIRO A RECEBER', sign: '(=)', rowClass: 'bg-slate-100 font-extrabold text-slate-900', stickyBg: 'bg-slate-100', type: 'formula' },
+            { key: 'repasseUnimedUnihealth', label: 'REPASSE UNIMED A UNIHEALTH', sign: '(-)', rowClass: 'bg-white font-bold text-unihealth-green', stickyBg: 'bg-white', type: 'auto' },
+            { key: 'saldoReceberFluxoCaixa', label: 'SALDO A RECEBER - VISÃO FLUXO CAIXA', sign: '=', rowClass: 'bg-slate-50 font-extrabold text-slate-800', stickyBg: 'bg-slate-50', type: 'formula' },
+            { key: 'excedentesProducao', label: 'REEMBOLSO MULTAS E JUROS', sign: '(+)', rowClass: 'bg-white font-semibold text-slate-700', stickyBg: 'bg-white', type: 'manual' },
+            { key: 'resultadoFinanceiroFluxoCaixa', label: 'RESULTADO FINANCEIRO FLUXO CAIXA', sign: '=', rowClass: 'bg-lime-300/85 font-extrabold text-slate-950', stickyBg: 'bg-lime-300', type: 'highlight' }
+        ];
+
+        function exportAccountSettlementExcel() {
+            const shortMonthNames = {
+                '2026-01': 'jan/26', '2026-02': 'fev/26', '2026-03': 'mar/26', '2026-04': 'abr/26',
+                '2026-05': 'mai/26', '2026-06': 'jun/26', '2026-07': 'jul/26', '2026-08': 'ago/26',
+                '2026-09': 'set/26', '2026-10': 'out/26', '2026-11': 'nov/26', '2026-12': 'dez/26'
+            };
+
+            const allMonthsData = UNIMED_12_MONTHS.map(m => computeAccountSettlementMonth(m.ym));
+            const visibleMonthsData = allMonthsData.filter(d => !!esVisibleMonths[d.ym]);
+
+            let lastSelectedIdx = -1;
+            allMonthsData.forEach((d, idx) => {
+                if (esVisibleMonths[d.ym]) lastSelectedIdx = idx;
+            });
+            if (lastSelectedIdx < 0) lastSelectedIdx = allMonthsData.length - 1;
+
+            const totals = allMonthsData.slice(0, lastSelectedIdx + 1).reduce((acc, row) => {
+                Object.keys(row).forEach(k => {
+                    if (k !== 'ym') acc[k] = (acc[k] || 0) + Number(row[k] || 0);
+                });
+                return acc;
+            }, {});
+
+            const lastMonthLabel = (shortMonthNames[allMonthsData[lastSelectedIdx].ym] || 'Acum.').toUpperCase();
+            const acumHeader = `ACUMULADO (ATÉ ${lastMonthLabel})`;
+
+            const aoa = [
+                ['ENCONTRO DE CONTAS 2026', 'Sinal', ...visibleMonthsData.map(d => shortMonthNames[d.ym]), acumHeader]
+            ];
+
+            ES_ROW_DEFINITIONS.forEach(def => {
+                aoa.push([
+                    def.label,
+                    def.sign,
+                    ...visibleMonthsData.map(mData => Number(Number(mData[def.key] || 0).toFixed(2))),
+                    Number(Number(totals[def.key] || 0).toFixed(2))
+                ]);
+            });
+
+            const ws = XLSX.utils.aoa_to_sheet(aoa);
+            ws['!cols'] = [
+                { wch: 40 },
+                { wch: 7 },
+                ...visibleMonthsData.map(() => ({ wch: 16 })),
+                { wch: 22 }
+            ];
+
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, 'Encontro_Contas_2026');
+            XLSX.writeFile(wb, `Encontro_de_Contas_2026_${getTodayISODate()}.xlsx`);
+            showToast('Encontro de Contas 2026 exportado para Excel!');
+        }
+
+        function renderAccountSettlementModule(preserveFocus = false) {
+            const tbody = document.getElementById('es-matrix-tbody');
+            if (!tbody) return;
+
+            let activeInfo = null;
+            if (preserveFocus && document.activeElement && document.activeElement.dataset && document.activeElement.dataset.esYm) {
+                activeInfo = {
+                    ym: document.activeElement.dataset.esYm,
+                    field: document.activeElement.dataset.esField,
+                    selStart: document.activeElement.selectionStart,
+                    selEnd: document.activeElement.selectionEnd
+                };
+            }
+
+            const shortMonthNames = {
+                '2026-01': 'jan/26', '2026-02': 'fev/26', '2026-03': 'mar/26', '2026-04': 'abr/26',
+                '2026-05': 'mai/26', '2026-06': 'jun/26', '2026-07': 'jul/26', '2026-08': 'ago/26',
+                '2026-09': 'set/26', '2026-10': 'out/26', '2026-11': 'nov/26', '2026-12': 'dez/26'
+            };
+
+            const pillsContainer = document.getElementById('es-months-filter-pills');
+            if (pillsContainer) {
+                pillsContainer.innerHTML = UNIMED_12_MONTHS.map(m => {
+                    const isChecked = !!esVisibleMonths[m.ym];
+                    return `
+                        <button type="button" onclick="toggleAccountSettlementMonth('${m.ym}')"
+                            class="px-2 py-0.5 rounded text-[10px] font-bold border transition-all ${isChecked ? 'bg-unihealth-green text-white border-unihealth-green' : 'bg-white text-slate-500 border-slate-200 hover:bg-slate-100'}">
+                            ${shortMonthNames[m.ym]}
+                        </button>
+                    `;
+                }).join('');
+            }
+
+            const allMonthsData = UNIMED_12_MONTHS.map(m => computeAccountSettlementMonth(m.ym));
+            const visibleMonthsData = allMonthsData.filter(d => !!esVisibleMonths[d.ym]);
+
+            // Determina o índice do último mês selecionado:
+            // Meses anteriores desmarcados CONTINUAM no total acumulado; meses posteriores ao último selecionado NÃO entram no total.
+            let lastSelectedIdx = -1;
+            allMonthsData.forEach((d, idx) => {
+                if (esVisibleMonths[d.ym]) lastSelectedIdx = idx;
+            });
+            if (lastSelectedIdx < 0) lastSelectedIdx = allMonthsData.length - 1;
+
+            const theadRow = document.getElementById('es-matrix-thead-row');
+            if (theadRow) {
+                const lastMonthLabel = shortMonthNames[allMonthsData[lastSelectedIdx].ym] || 'Acum.';
+                theadRow.innerHTML = `
+                    <th class="py-2 px-2 sticky left-0 bg-[#0A5C36] z-10 w-[235px] max-w-[235px]">ENCONTRO DE CONTAS 2026</th>
+                    <th class="py-2 px-1 text-center w-7">Sinal</th>
+                    ${visibleMonthsData.map(d => `<th class="py-2 px-1 text-right">${shortMonthNames[d.ym]}</th>`).join('')}
+                    <th class="py-2 px-2 text-right bg-[#013A19]">ACUM. (ATÉ ${lastMonthLabel.toUpperCase()})</th>
+                `;
+            }
+
+            const totals = allMonthsData.slice(0, lastSelectedIdx + 1).reduce((acc, row) => {
+                Object.keys(row).forEach(k => {
+                    if (k !== 'ym') acc[k] = (acc[k] || 0) + Number(row[k] || 0);
+                });
+                return acc;
+            }, {});
+
+            const kpiContractEl = document.getElementById('es-kpi-contract');
+            if (kpiContractEl) kpiContractEl.textContent = formatCurrency(totals.receitaContrato);
+            const kpiExpSubEl = document.getElementById('es-kpi-expenses-sub');
+            if (kpiExpSubEl) kpiExpSubEl.textContent = `Despesas ND: ${formatCurrency(totals.despesasPagtoDireto)}`;
+            const kpiAccResEl = document.getElementById('es-kpi-accounting-result');
+            if (kpiAccResEl) kpiAccResEl.textContent = formatCurrency(totals.resultadoContabilOperadora);
+            const kpiFinRecEl = document.getElementById('es-kpi-fin-receivable');
+            if (kpiFinRecEl) kpiFinRecEl.textContent = formatCurrency(totals.saldoFinanceiroReceber);
+            const kpiRepSubEl = document.getElementById('es-kpi-repasses-sub');
+            if (kpiRepSubEl) kpiRepSubEl.textContent = `Repasses CC 1234-3: ${formatCurrency(totals.repasseUnimedUnihealth)}`;
+            const cfResEl = document.getElementById('es-kpi-cashflow-result');
+            if (cfResEl) {
+                cfResEl.textContent = formatCurrency(totals.resultadoFinanceiroFluxoCaixa);
+            }
+
+            const rowDefs = ES_ROW_DEFINITIONS;
+
+            tbody.innerHTML = rowDefs.map(def => {
+                const cellsHtml = visibleMonthsData.map(mData => {
+                    const val = Number(mData[def.key] || 0);
+                    if (def.type === 'manual') {
+                        return `
+                            <td class="py-0.5 px-1 text-right whitespace-nowrap">
+                                <input type="number" step="0.01"
+                                    data-es-ym="${mData.ym}"
+                                    data-es-field="${def.key}"
+                                    value="${val !== 0 ? val : ''}"
+                                    placeholder="0,00"
+                                    oninput="updateAccountSettlementField('${mData.ym}', '${def.key}', this.value)"
+                                    class="w-[82px] px-1 py-0.5 text-right text-[10px] font-semibold border border-slate-200 rounded bg-amber-50/40 focus:bg-white focus:outline-none focus:ring-1 focus:ring-unihealth-green">
+                            </td>
+                        `;
+                    }
+                    const negClass = val < -0.005 ? 'text-rose-700' : '';
+                    return `<td class="py-1.5 px-1 text-right whitespace-nowrap ${negClass}">${formatMatrixMoney(val)}</td>`;
+                }).join('');
+
+                const totVal = Number(totals[def.key] || 0);
+                const totNegClass = totVal < -0.005 ? 'text-rose-700' : '';
+
+                return `
+                    <tr class="${def.rowClass}">
+                        <td class="py-1.5 px-2 sticky left-0 ${def.stickyBg} z-10 border-r border-slate-200 truncate max-w-[235px]" title="${escapeHTML(def.label)}">${escapeHTML(def.label)}</td>
+                        <td class="py-1.5 px-1 text-center text-slate-500 font-bold whitespace-nowrap">${escapeHTML(def.sign)}</td>
+                        ${cellsHtml}
+                        <td class="py-1.5 px-2 text-right whitespace-nowrap font-extrabold bg-slate-200/60 border-l border-slate-300 ${totNegClass}">${formatMatrixMoney(totVal)}</td>
+                    </tr>
+                `;
+            }).join('');
+
+            if (activeInfo) {
+                const targetInput = tbody.querySelector(`input[data-es-ym="${activeInfo.ym}"][data-es-field="${activeInfo.field}"]`);
+                if (targetInput) {
+                    targetInput.focus();
+                    try {
+                        if (activeInfo.selStart !== null) targetInput.setSelectionRange(activeInfo.selStart, activeInfo.selEnd);
+                    } catch (e) {}
+                }
+            }
         }
     </script>
 </body>
