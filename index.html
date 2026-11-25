@@ -36,7 +36,7 @@
     <div id="login-screen" class="min-h-screen bg-[#013A19] flex items-center justify-center p-4">
         <div class="w-full max-w-md bg-white rounded-3xl shadow-2xl overflow-hidden border border-emerald-900/20">
             <div class="bg-[#013A19] px-8 py-8 flex items-center justify-center">
-                <!-- Logo Oficial Unihealth Gestão Hospitalar (sem distorção) -->
+                <!-- Logo Oficial Unihealth Gestão Hospitalar -->
                 <svg viewBox="0 0 360 112" preserveAspectRatio="xMidYMid meet" class="w-72 h-auto mx-auto" xmlns="http://www.w3.org/2000/svg">
                     <rect x="8" y="18" width="292" height="76" rx="10" fill="#013A19"/>
                     <text x="18" y="70" fill="#FFFFFF" font-family="Inter, sans-serif" font-weight="800" font-size="47" letter-spacing="-1.2">Unihealth</text>
@@ -50,11 +50,11 @@
             <form onsubmit="handleLogin(event)" class="p-8 space-y-4">
                 <div>
                     <label class="block text-xs font-bold uppercase text-slate-600 mb-1.5">Usuário Institucional</label>
-                    <input type="text" id="login-user" value="icds" required class="w-full px-4 py-3 text-sm border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-unihealth-green">
+                    <input type="text" id="login-user" value="" required class="w-full px-4 py-3 text-sm border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-unihealth-green">
                 </div>
                 <div>
                     <label class="block text-xs font-bold uppercase text-slate-600 mb-1.5">Senha de Acesso</label>
-                    <input type="password" id="login-pass" value="unimed" required class="w-full px-4 py-3 text-sm border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-unihealth-green">
+                    <input type="password" id="login-pass" value="" required class="w-full px-4 py-3 text-sm border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-unihealth-green">
                 </div>
                 <p id="login-error" class="hidden text-xs font-semibold text-rose-600 bg-rose-50 px-3 py-2 rounded-lg">Credenciais inválidas. Verifique usuário e senha.</p>
                 <button type="submit" class="w-full py-3 bg-unihealth-green hover:bg-unihealth-greenMid text-white font-bold text-sm rounded-xl shadow-md transition-all">
@@ -1598,7 +1598,8 @@
                     </div>
                     <div>
                         <label class="block font-bold text-slate-600 mb-1">Orçamento</label>
-                        <input type="text" id="nd-edit-budget" placeholder="Ex.: OPME / Farmácia" class="w-full px-3 py-2 border border-slate-200 rounded-xl">
+                        <select id="nd-edit-budget" onchange="handleDebitNoteBudgetSelectChange()" class="w-full px-3 py-2 border border-slate-200 rounded-xl bg-white font-semibold"></select>
+                        <input type="text" id="nd-edit-budget-new" placeholder="Novo tipo de ND / Orçamento..." class="hidden mt-1.5 w-full px-3 py-2 border border-violet-300 bg-violet-50/40 rounded-xl font-semibold focus:outline-none focus:ring-2 focus:ring-violet-700">
                     </div>
                     <div>
                         <label class="block font-bold text-slate-600 mb-1">Espécie</label>
@@ -1850,6 +1851,7 @@
         var receivables = [];
         var debitNotes = [];
         var debitNoteSort = { key: 'competencia', dir: 'asc' };
+        var customDebitNoteBudgets = [];
         var accountSettlementSchedule = {};
         var esVisibleMonths = {
             '2026-01': true, '2026-02': true, '2026-03': true, '2026-04': true,
@@ -1982,6 +1984,7 @@
                     plannedPayments,
                     receivables,
                     debitNotes,
+                    customDebitNoteBudgets,
                     accountSettlementSchedule,
                     updatedAt: nowIso
                 });
@@ -2062,6 +2065,10 @@
                             debitNotes = remoteData.debitNotes;
                             batch.push(['debit_notes_list', debitNotes]);
                         }
+                        if (Array.isArray(remoteData.customDebitNoteBudgets)) {
+                            customDebitNoteBudgets = remoteData.customDebitNoteBudgets;
+                            batch.push(['custom_debit_note_budgets', customDebitNoteBudgets]);
+                        }
                         if (remoteData.accountSettlementSchedule && typeof remoteData.accountSettlementSchedule === 'object') {
                             accountSettlementSchedule = { ...accountSettlementSchedule, ...remoteData.accountSettlementSchedule };
                             batch.push(['account_settlement_schedule', accountSettlementSchedule]);
@@ -2091,6 +2098,7 @@
                 ['planned_payments', plannedPayments],
                 ['receivables_list', receivables],
                 ['debit_notes_list', debitNotes],
+                ['custom_debit_note_budgets', customDebitNoteBudgets],
                 ['account_settlement_schedule', accountSettlementSchedule]
             ]);
             updateCloudStatusBadge(true, `Salvo (CP: ${payables.length} | CR: ${receivables.length})`);
@@ -2100,7 +2108,11 @@
         }
 
         async function initCloudSync() {
-            const [savedPayables, savedSettings, savedAccounts, savedBankTx, savedUnimedSchedule, savedProvisions, savedPlanned, savedReceivables, savedDebitNotes, savedSettlement] = await Promise.all([
+            const [
+                savedPayables, savedSettings, savedAccounts, savedBankTx,
+                savedUnimedSchedule, savedProvisions, savedPlanned,
+                savedReceivables, savedDebitNotes, savedCustomBudgets, savedSettlement
+            ] = await Promise.all([
                 loadFromIndexedDB('payables_list'),
                 loadFromIndexedDB('payables_settings'),
                 loadFromIndexedDB('bank_accounts'),
@@ -2110,6 +2122,7 @@
                 loadFromIndexedDB('planned_payments'),
                 loadFromIndexedDB('receivables_list'),
                 loadFromIndexedDB('debit_notes_list'),
+                loadFromIndexedDB('custom_debit_note_budgets'),
                 loadFromIndexedDB('account_settlement_schedule')
             ]);
 
@@ -2140,6 +2153,7 @@
             if (Array.isArray(savedPlanned)) plannedPayments = savedPlanned;
             if (Array.isArray(savedReceivables)) receivables = savedReceivables;
             if (Array.isArray(savedDebitNotes)) debitNotes = savedDebitNotes;
+            if (Array.isArray(savedCustomBudgets)) customDebitNoteBudgets = savedCustomBudgets;
             if (savedSettlement && typeof savedSettlement === 'object') accountSettlementSchedule = savedSettlement;
 
             ensureThirtyDaysCutoffInit();
@@ -3159,17 +3173,20 @@
             let despNaoOperacionais = 0;
             let laboratory = 0;
             let allNotesTotal = 0;
+            const customBudgetsMap = {};
+
+            const normCustomSet = new Set(
+                (customDebitNoteBudgets || []).map(b =>
+                    String(b || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/\s+/g, ' ').trim().toUpperCase()
+                ).filter(Boolean)
+            );
 
             (debitNotes || []).forEach(n => {
                 if (n.competencia !== targetComp) return;
                 const val = Number(n.amount || 0);
                 allNotesTotal += val;
-                const normBudget = String(n.budget || '')
-                    .normalize('NFD')
-                    .replace(/[\u0300-\u036f]/g, '')
-                    .replace(/\s+/g, ' ')
-                    .trim()
-                    .toUpperCase();
+                const rawBudget = String(n.budget || '').replace(/\s+/g, ' ').trim();
+                const normBudget = rawBudget.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toUpperCase();
 
                 if (normBudget.includes('LABORATORIO')) {
                     laboratory += val;
@@ -3185,16 +3202,21 @@
                     despOperacionaisGerais += val;
                 } else if (normBudget === 'DESPESAS NAO OPERACIONAIS') {
                     despNaoOperacionais += val;
+                } else if (rawBudget && (normCustomSet.has(normBudget) || !normBudget.startsWith('RECEITA'))) {
+                    const labelKey = rawBudget.toUpperCase();
+                    customBudgetsMap[labelKey] = (customBudgetsMap[labelKey] || 0) + val;
                 }
             });
 
+            const customDirectTotal = Object.values(customBudgetsMap).reduce((s, v) => s + Number(v || 0), 0);
             const directExpenses =
                 matMedPaciente +
                 matConsumoGeral +
                 servTerceirosPJ +
                 honorariosMedicos +
                 despOperacionaisGerais +
-                despNaoOperacionais;
+                despNaoOperacionais +
+                customDirectTotal;
 
             return {
                 matMedPaciente,
@@ -3203,6 +3225,7 @@
                 honorariosMedicos,
                 despOperacionaisGerais,
                 despNaoOperacionais,
+                customBudgetsMap,
                 directExpenses,
                 laboratory,
                 allNotesTotal
@@ -3217,7 +3240,6 @@
             const cfg = (unimedContractSchedule && unimedContractSchedule[ym]) || { contractValue: 0, operatorPaid: 0 };
             const contractValue = Number(cfg.contractValue || 0);
             const ndTotals = getDebitNotesBudgetBreakdownByYM(ym);
-            // Puxa automaticamente o total das notas de débito da competência (mantém fallback manual apenas se ainda não houver notas lançadas no mês)
             const operatorPaid = ndTotals.allNotesTotal > 0 ? ndTotals.allNotesTotal : Number(cfg.operatorPaid || 0);
             const netExpected = contractValue - operatorPaid;
             const txs = (bankTransactions || []).filter(t => isUnimedTransferTx(t) && (t.date || '').startsWith(ym));
@@ -3812,7 +3834,6 @@
                 return { category: 'Aplicação / Resgate Invest Fácil', payerName: 'Bradesco Invest Fácil', origin: '' };
             }
 
-            // 1. Convênios Hospitalares (prioridade antes de PIX/TED para classificar corretamente transferências de convênios)
             const convenioPatterns = [
                 { regex: /CEMIG\s*SAUDE|PSI\s*CEMIG|CEMIG\b/, name: 'CEMIG SAÚDE' },
                 { regex: /VALE\b|PASA\b|AMS\s*VALE/, name: 'VALE / PASA' },
@@ -3839,7 +3860,6 @@
                 }
             }
 
-            // 2. Operadoras de Cartão (Cielo, Rede, Getnet, Stone, etc.) — distingue Débito vs Crédito
             if (/CIELO|REDECARD|REDE\b|GETNET|STONE|PAGSEGURO|SIPAG|SAFRAPAY|BIN\b|CARTAO|CART[ÃA]O|CREDITO\s+CART|DEBITO\s+CART|VISA|MASTERCARD|ELO\b/.test(up)) {
                 const isDebitCard = /DEBITO|D[ÉE]BITO|ELO\s+DB|VISA\s+ELECTRON|MAESTRO/.test(up);
                 let brand = isDebitCard ? 'Cielo / Cartão Débito' : 'Cielo / Cartão Crédito';
@@ -3857,7 +3877,6 @@
                 };
             }
 
-            // 3. PIX Recebido (Particulares / Pacientes)
             if (/PIX\b|QR\s*CODE/.test(up)) {
                 const remMatch = up.match(/(?:REM:|REMET\.?|FAVORECIDO:?)\s*([A-ZÀ-Ú0-9\s\.\-&]{3,45})/);
                 const extractedName = remMatch && remMatch[1]
@@ -4209,8 +4228,6 @@
             extractedTxs.forEach(t => existingMap.set(t.id, t));
             bankTransactions = Array.from(existingMap.values());
 
-            // Previne duplicidade: se já existem lançamentos detalhados da Cielo (CIELO-REC- / CIELO-SALE-),
-            // créditos da operadora CIELO na CC 0001127-4 NÃO são duplicados no Contas a Receber
             const hasCieloDetailedData = receivables.some(r => String(r.id || '').startsWith('CIELO-'));
             const existingCrBankIds = new Set(receivables.map(r => r.bankTxId).filter(Boolean));
             let skippedCieloDupCount = 0;
@@ -4431,14 +4448,12 @@
             if (!pendingCieloParsed) return;
             const { salesCreditInstallments, receivablesPayments } = pendingCieloParsed;
 
-            // Remove eventuais lançamentos bancários genéricos da operadora Cielo vindos da CC 0001127-4 para evitar qualquer duplicidade
             receivables = receivables.filter(r => {
                 if (!r.bankTxId) return true;
                 const isGenericCardEntry = r.origin === 'Cartão de Crédito' || r.origin === 'Cartão de Débito' || /CIELO/i.test(`${r.payerName || ''} ${r.notes || ''}`);
                 return !isGenericCardEntry;
             });
 
-            // 1. Insere/atualiza parcelas geradas pelo Extrato de Vendas Cielo (sem duplicar vendas já importadas)
             const existingIds = new Set(receivables.map(r => r.id));
             const saleOccMap = {};
             let addedInstallments = 0;
@@ -4468,7 +4483,6 @@
                 }
             });
 
-            // 2. Baixa automaticamente os títulos correspondentes com base no Extrato de Recebíveis Cielo (Crédito + Débito)
             let settledCount = 0;
             let importedPaidCount = 0;
 
@@ -4780,7 +4794,6 @@
             const defaultLastDayISO = getLastDayOfCurrentMonthISO();
             const cutoffISO = document.getElementById('cr-cutoff-date')?.value || defaultLastDayISO;
 
-            // Consolida recebimentos do mês sem duplicidade entre Cielo Detalhado e CC 0001127-4
             const receivedSummary = getReceivedCurrentMonthConsolidated(currentYM);
 
             const periodOpenItems = receivables.filter(r =>
@@ -5136,6 +5149,100 @@
         // ---------------------------------------------------------
         // 12. MÓDULO 5: NOTAS DE DÉBITO (COMPETÊNCIA, "+", EDITAR, VALIDAR)
         // ---------------------------------------------------------
+        const BASE_ND_BUDGET_OPTIONS = [
+            'MATERIAIS E MEDICAMENTOS DE USO NO PACIENTE',
+            'MATERIAIS DE CONSUMO GERAL',
+            'SERVIÇOS DE TERCEIROS - PESSOA JURÍDICA',
+            'HONORÁRIOS MÉDICOS',
+            'DESPESAS OPERACIONAIS GERAIS',
+            'DESPESAS NÃO OPERACIONAIS',
+            'LABORATÓRIO'
+        ];
+
+        function getDebitNoteBudgetList(extraBudget = '') {
+            const seen = new Set();
+            const list = [];
+            const addItem = (val) => {
+                const clean = String(val || '').replace(/\s+/g, ' ').trim().toUpperCase();
+                if (!clean || clean === '__NEW__') return;
+                if (!seen.has(clean)) {
+                    seen.add(clean);
+                    list.push(clean);
+                }
+            };
+            BASE_ND_BUDGET_OPTIONS.forEach(addItem);
+            (customDebitNoteBudgets || []).forEach(addItem);
+            (debitNotes || []).forEach(n => addItem(n.budget));
+            if (extraBudget) addItem(extraBudget);
+            return list;
+        }
+
+        function populateDebitNoteBudgetSelect(selectedBudget = '') {
+            const sel = document.getElementById('nd-edit-budget');
+            const newInp = document.getElementById('nd-edit-budget-new');
+            if (!sel || !newInp) return;
+
+            const options = getDebitNoteBudgetList(selectedBudget);
+            const cleanSel = String(selectedBudget || '').replace(/\s+/g, ' ').trim().toUpperCase();
+
+            sel.innerHTML =
+                options.map(opt => `<option value="${escapeHTML(opt)}">${escapeHTML(opt)}</option>`).join('') +
+                `<option value="__NEW__">Novo</option>`;
+
+            if (cleanSel && options.includes(cleanSel)) {
+                sel.value = cleanSel;
+                newInp.classList.add('hidden');
+                newInp.required = false;
+                newInp.value = '';
+            } else if (cleanSel) {
+                sel.value = '__NEW__';
+                newInp.classList.remove('hidden');
+                newInp.required = true;
+                newInp.value = cleanSel;
+            } else {
+                sel.value = options[0] || '';
+                newInp.classList.add('hidden');
+                newInp.required = false;
+                newInp.value = '';
+            }
+        }
+
+        function handleDebitNoteBudgetSelectChange() {
+            const sel = document.getElementById('nd-edit-budget');
+            const newInp = document.getElementById('nd-edit-budget-new');
+            if (!sel || !newInp) return;
+            if (sel.value === '__NEW__') {
+                newInp.classList.remove('hidden');
+                newInp.required = true;
+                newInp.focus();
+            } else {
+                newInp.classList.add('hidden');
+                newInp.required = false;
+                newInp.value = '';
+            }
+        }
+
+        function resolveDebitNoteBudgetValue() {
+            const sel = document.getElementById('nd-edit-budget');
+            const newInp = document.getElementById('nd-edit-budget-new');
+            if (!sel) return '';
+            if (sel.value === '__NEW__') {
+                const typed = String(newInp?.value || '').replace(/\s+/g, ' ').trim().toUpperCase();
+                if (!typed) return '';
+                const existingNorm = new Set(
+                    [...BASE_ND_BUDGET_OPTIONS, ...customDebitNoteBudgets].map(b =>
+                        String(b || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/\s+/g, ' ').trim().toUpperCase()
+                    )
+                );
+                const typedNorm = typed.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toUpperCase();
+                if (!existingNorm.has(typedNorm)) {
+                    customDebitNoteBudgets.push(typed);
+                }
+                return typed;
+            }
+            return String(sel.value || '').trim().toUpperCase();
+        }
+
         function getCurrentSystemCompetenciaMMAAAA() {
             const [y, m] = getTodayISODate().slice(0, 7).split('-');
             return `${m}/${y}`;
@@ -5197,7 +5304,6 @@
         function cleanSupplierNameOnly(raw) {
             let s = String(raw || '').trim();
             if (!s) return '';
-            // Remove prefixos como "ND 2039 (NF 001022878) - " ou "ND-2039 / NF 123 - "
             s = s.replace(/^(?:ND|N\.?D\.?)\s*[-#:]?\s*\w*(?:\s*\((?:NF|N\.?F\.?)\s*[-#:]?\s*\w*\))?\s*[-–—:|]+\s*/i, '').trim();
             s = s.replace(/^(?:NF|N\.?F\.?)\s*[-#:]?\s*\w*\s*[-–—:|]+\s*/i, '').trim();
             return s.toUpperCase();
@@ -5206,13 +5312,11 @@
         function parseFlexibleMoney(raw) {
             if (typeof raw === 'number') {
                 if (isNaN(raw)) return 0;
-                // Evita tratar números inteiros gigantes (ex.: códigos/números de NF) como valor monetário
                 if (Number.isInteger(raw) && Math.abs(raw) > 9999999) return 0;
                 return raw;
             }
             if (raw === null || raw === undefined || raw === '') return 0;
             const s = String(raw).trim();
-            // Se for string puramente numérica sem separador decimal e muito longa (ex.: número de NF), ignora
             if (/^\d{8,}$/.test(s)) return 0;
             const direct = parseCurrencyBR(s);
             if (direct !== 0) return direct;
@@ -5295,7 +5399,6 @@
 
                         let amount = Math.abs(parseFlexibleMoney(pickColumnValue(normObj, ['valor', 'vlr', 'valornd', 'valordebito', 'valorbruto', 'valorliquido', 'total'], ['valor', 'vlr'])));
                         if (amount === 0) {
-                            // Procura apenas valores formatados com vírgula/decimal ou números decimais plausíveis (nunca inteiros longos de NF)
                             for (let cIdx = 1; cIdx < row.length; cIdx++) {
                                 const hNorm = normalizeColKey(headers[cIdx] || '');
                                 if (hNorm.includes('nota') || hNorm.includes('fiscal') || hNorm.includes('debito') || hNorm.includes('numero') || hNorm.includes('num') || hNorm.includes('cod') || hNorm.includes('id')) {
@@ -5350,7 +5453,7 @@
                 }
 
                 debitNotes = debitNotes.concat(imported);
-                renderDebitNotesModule();
+                renderAllViews();
                 await persistAllState(true);
                 showToast(`${imported.length} Nota(s) de Débito importada(s) com sucesso!`);
             } catch (err) {
@@ -5390,7 +5493,7 @@
             closeNewCompetenciaDebitNotesModal();
             const selComp = document.getElementById('nd-filter-competencia');
             if (selComp) selComp.value = targetComp;
-            renderDebitNotesModule();
+            renderAllViews();
             await persistAllState(true);
             showToast(`${result.createdCount} lançamento(s) de ${result.prevComp} replicado(s) para ${targetComp} (ND e NF em branco)!`);
         }
@@ -5440,7 +5543,7 @@
                 showToast(`Não há lançamentos na competência anterior (${result.prevComp}) para duplicar em ${targetComp}.`);
                 return;
             }
-            renderDebitNotesModule();
+            renderAllViews();
             await persistAllState(true);
             showToast(`${result.createdCount} lançamento(s) de ${result.prevComp} duplicado(s) para ${targetComp} (ND e NF em branco)!`);
         }
@@ -5475,7 +5578,7 @@
             };
 
             debitNotes.unshift(clone);
-            renderDebitNotesModule();
+            renderAllViews();
             await persistAllState(true);
             showToast(`Duplicado "${note.supplier}" para ${targetComp} (ND e NF em branco)!`);
         }
@@ -5493,7 +5596,7 @@
             document.getElementById('nd-edit-nf').value = '';
             document.getElementById('nd-edit-supplier').value = '';
             document.getElementById('nd-edit-origin').value = '';
-            document.getElementById('nd-edit-budget').value = '';
+            populateDebitNoteBudgetSelect(BASE_ND_BUDGET_OPTIONS[0]);
             document.getElementById('nd-edit-species').value = '';
             document.getElementById('nd-edit-amount').value = '';
             document.getElementById('nd-edit-status').value = 'Pendente';
@@ -5514,7 +5617,7 @@
             document.getElementById('nd-edit-nf').value = note.invoiceNumber || '';
             document.getElementById('nd-edit-supplier').value = cleanSupplierNameOnly(note.supplier || '');
             document.getElementById('nd-edit-origin').value = note.origin || '';
-            document.getElementById('nd-edit-budget').value = note.budget || '';
+            populateDebitNoteBudgetSelect(note.budget || '');
             document.getElementById('nd-edit-species').value = note.species || '';
             document.getElementById('nd-edit-amount').value = Number(note.amount || 0);
             document.getElementById('nd-edit-status').value = note.status === 'Validado' ? 'Validado' : 'Pendente';
@@ -5538,10 +5641,15 @@
             const invoiceNumber = document.getElementById('nd-edit-nf').value.trim();
             const supplier = cleanSupplierNameOnly(document.getElementById('nd-edit-supplier').value);
             const origin = document.getElementById('nd-edit-origin').value.trim();
-            const budget = document.getElementById('nd-edit-budget').value.trim();
+            const budget = resolveDebitNoteBudgetValue();
             const species = document.getElementById('nd-edit-species').value.trim();
             const amount = parseFloat(document.getElementById('nd-edit-amount').value) || 0;
             const status = document.getElementById('nd-edit-status').value === 'Validado' ? 'Validado' : 'Pendente';
+
+            if (!budget) {
+                showToast('Informe ou selecione o orçamento da Nota de Débito.');
+                return;
+            }
 
             if (id) {
                 const existing = debitNotes.find(n => n.id === id);
@@ -5572,16 +5680,16 @@
             }
 
             closeDebitNoteEditModal();
-            renderDebitNotesModule();
+            renderAllViews();
             await persistAllState(true);
-            showToast('Nota de Débito salva com sucesso!');
+            showToast('Nota de Débito salva e integrada ao Encontro de Contas!');
         }
 
         async function validateDebitNote(noteId) {
             const note = debitNotes.find(n => n.id === noteId);
             if (!note) return;
             note.status = note.status === 'Validado' ? 'Pendente' : 'Validado';
-            renderDebitNotesModule();
+            renderAllViews();
             await persistAllState(true);
             showToast(note.status === 'Validado' ? 'Nota de Débito validada!' : 'Validação revertida para Pendente.');
         }
@@ -5680,32 +5788,18 @@
             const tbody = document.getElementById('nd-tbody');
             if (!tbody) return;
 
-            const currentComp = getCurrentSystemCompetenciaMMAAAA();
             const compSelect = document.getElementById('nd-filter-competencia');
             const prevSelectedComp = compSelect ? compSelect.value : 'all';
             const budgetSelect = document.getElementById('nd-filter-budget');
             const prevSelectedBudget = budgetSelect ? budgetSelect.value : 'all';
 
             const compSet = new Set();
-            const budgetSet = new Set([
-                'MATERIAIS E MEDICAMENTOS DE USO NO PACIENTE',
-                'MATERIAIS DE CONSUMO GERAL',
-                'SERVIÇOS DE TERCEIROS - PESSOA JURÍDICA',
-                'HONORÁRIOS MÉDICOS',
-                'DESPESAS OPERACIONAIS GERAIS',
-                'DESPESAS NÃO OPERACIONAIS'
-            ]);
-            let currentMonthTotal = 0;
-            let currentMonthCount = 0;
+            const budgetSet = new Set(getDebitNoteBudgetList());
 
             for (let i = 0; i < debitNotes.length; i++) {
                 const n = debitNotes[i];
                 if (n.competencia) compSet.add(n.competencia);
-                if (n.budget && String(n.budget).trim() !== '') budgetSet.add(String(n.budget).trim());
-                if (n.competencia === currentComp) {
-                    currentMonthTotal += Number(n.amount || 0);
-                    currentMonthCount++;
-                }
+                if (n.budget && String(n.budget).trim() !== '') budgetSet.add(String(n.budget).replace(/\s+/g, ' ').trim().toUpperCase());
             }
 
             if (compSelect) {
@@ -5785,18 +5879,6 @@
         // ---------------------------------------------------------
         // 13. MÓDULO 6: ENCONTRO DE CONTAS 2026 (INTEGRADO)
         // ---------------------------------------------------------
-        const ES_MANUAL_FIELDS = [
-            'notaFiscalEmitida',
-            'receitaParticularConvenios',
-            'reembolsoVariavelHonorario',
-            'reembolsoCai',
-            'reembolsoBancoHoras',
-            'reembolsoFerias',
-            'reembolsoRescisao',
-            'resultadoFinal2025',
-            'excedentesProducao'
-        ];
-
         function getAccountSettlementMonthEntry(ym) {
             if (!accountSettlementSchedule[ym]) {
                 accountSettlementSchedule[ym] = {
@@ -5826,11 +5908,11 @@
             const honorariosMedicos = Number(nd.honorariosMedicos || 0);
             const despOperacionaisGerais = Number(nd.despOperacionaisGerais || 0);
             const despNaoOperacionais = Number(nd.despNaoOperacionais || 0);
+            const customBudgetsMap = nd.customBudgetsMap || {};
             const despesasPagtoDireto = Number(nd.directExpenses || 0);
             const saldo = despesasPagtoDireto - receitaContrato;
 
             const notaFiscalEmitida = Number(manual.notaFiscalEmitida || 0);
-            // SALDO (negativo) + NOTA FISCAL EMITIDA (positivo)
             const diferencaReceitaNF = saldo + notaFiscalEmitida;
 
             const laboratorio = Number(nd.laboratory || 0);
@@ -5874,6 +5956,7 @@
                 honorariosMedicos,
                 despOperacionaisGerais,
                 despNaoOperacionais,
+                customBudgetsMap,
                 saldo,
                 notaFiscalEmitida,
                 diferencaReceitaNF,
@@ -5958,6 +6041,43 @@
             { key: 'resultadoFinanceiroFluxoCaixa', label: 'RESULTADO FINANCEIRO FLUXO CAIXA', sign: '=', rowClass: 'bg-lime-300/85 font-extrabold text-slate-950', stickyBg: 'bg-lime-300', type: 'highlight' }
         ];
 
+        function getCustomAccountSettlementBudgetRows(allMonthsData) {
+            const totalsByLabel = new Map();
+            (allMonthsData || []).forEach(mData => {
+                if (mData && mData.customBudgetsMap) {
+                    Object.entries(mData.customBudgetsMap).forEach(([lbl, v]) => {
+                        const cleanLbl = String(lbl || '').replace(/\s+/g, ' ').trim().toUpperCase();
+                        if (!cleanLbl) return;
+                        totalsByLabel.set(cleanLbl, (totalsByLabel.get(cleanLbl) || 0) + Number(v || 0));
+                    });
+                }
+            });
+
+            // Mantém apenas linhas customizadas cuja soma total de Notas de Débito seja diferente de zero
+            customDebitNoteBudgets = Array.from(totalsByLabel.entries())
+                .filter(([, totalVal]) => Math.abs(totalVal) >= 0.005)
+                .map(([lbl]) => lbl)
+                .sort((a, b) => a.localeCompare(b, 'pt-BR'));
+
+            return customDebitNoteBudgets.map(lbl => ({
+                key: `customBudget:${lbl}`,
+                label: `↳ ${lbl}`,
+                sign: '•',
+                rowClass: 'bg-white text-[9.5px] font-medium text-slate-600',
+                stickyBg: 'bg-white',
+                type: 'sub'
+            }));
+        }
+
+        function getAccountSettlementRowValue(obj, key) {
+            if (!obj) return 0;
+            if (String(key).startsWith('customBudget:')) {
+                const lbl = String(key).slice('customBudget:'.length);
+                return Number((obj.customBudgetsMap && obj.customBudgetsMap[lbl]) || 0);
+            }
+            return Number(obj[key] || 0);
+        }
+
         function exportAccountSettlementExcel() {
             const shortMonthNames = {
                 '2026-01': 'jan/26', '2026-02': 'fev/26', '2026-03': 'mar/26', '2026-04': 'abr/26',
@@ -5976,10 +6096,18 @@
 
             const totals = allMonthsData.slice(0, lastSelectedIdx + 1).reduce((acc, row) => {
                 Object.keys(row).forEach(k => {
-                    if (k !== 'ym') acc[k] = (acc[k] || 0) + Number(row[k] || 0);
+                    if (k === 'ym') return;
+                    if (k === 'customBudgetsMap') {
+                        acc.customBudgetsMap = acc.customBudgetsMap || {};
+                        Object.entries(row.customBudgetsMap || {}).forEach(([lbl, v]) => {
+                            acc.customBudgetsMap[lbl] = (acc.customBudgetsMap[lbl] || 0) + Number(v || 0);
+                        });
+                    } else {
+                        acc[k] = (acc[k] || 0) + Number(row[k] || 0);
+                    }
                 });
                 return acc;
-            }, {});
+            }, { customBudgetsMap: {} });
 
             const lastMonthLabel = (shortMonthNames[allMonthsData[lastSelectedIdx].ym] || 'Acum.').toUpperCase();
             const acumHeader = `ACUMULADO (ATÉ ${lastMonthLabel})`;
@@ -5988,12 +6116,20 @@
                 ['ENCONTRO DE CONTAS 2026', 'Sinal', ...visibleMonthsData.map(d => shortMonthNames[d.ym]), acumHeader]
             ];
 
-            ES_ROW_DEFINITIONS.forEach(def => {
+            const customRows = getCustomAccountSettlementBudgetRows(allMonthsData);
+            const subInsertIdx = ES_ROW_DEFINITIONS.findIndex(r => r.key === 'despNaoOperacionais') + 1;
+            const exportRows = [
+                ...ES_ROW_DEFINITIONS.slice(0, subInsertIdx),
+                ...customRows,
+                ...ES_ROW_DEFINITIONS.slice(subInsertIdx)
+            ];
+
+            exportRows.forEach(def => {
                 aoa.push([
                     def.label,
                     def.sign,
-                    ...visibleMonthsData.map(mData => Number(Number(mData[def.key] || 0).toFixed(2))),
-                    Number(Number(totals[def.key] || 0).toFixed(2))
+                    ...visibleMonthsData.map(mData => Number(getAccountSettlementRowValue(mData, def.key).toFixed(2))),
+                    Number(getAccountSettlementRowValue(totals, def.key).toFixed(2))
                 ]);
             });
 
@@ -6047,8 +6183,6 @@
             const allMonthsData = UNIMED_12_MONTHS.map(m => computeAccountSettlementMonth(m.ym));
             const visibleMonthsData = allMonthsData.filter(d => !!esVisibleMonths[d.ym]);
 
-            // Determina o índice do último mês selecionado:
-            // Meses anteriores desmarcados CONTINUAM no total acumulado; meses posteriores ao último selecionado NÃO entram no total.
             let lastSelectedIdx = -1;
             allMonthsData.forEach((d, idx) => {
                 if (esVisibleMonths[d.ym]) lastSelectedIdx = idx;
@@ -6068,10 +6202,18 @@
 
             const totals = allMonthsData.slice(0, lastSelectedIdx + 1).reduce((acc, row) => {
                 Object.keys(row).forEach(k => {
-                    if (k !== 'ym') acc[k] = (acc[k] || 0) + Number(row[k] || 0);
+                    if (k === 'ym') return;
+                    if (k === 'customBudgetsMap') {
+                        acc.customBudgetsMap = acc.customBudgetsMap || {};
+                        Object.entries(row.customBudgetsMap || {}).forEach(([lbl, v]) => {
+                            acc.customBudgetsMap[lbl] = (acc.customBudgetsMap[lbl] || 0) + Number(v || 0);
+                        });
+                    } else {
+                        acc[k] = (acc[k] || 0) + Number(row[k] || 0);
+                    }
                 });
                 return acc;
-            }, {});
+            }, { customBudgetsMap: {} });
 
             const kpiContractEl = document.getElementById('es-kpi-contract');
             if (kpiContractEl) kpiContractEl.textContent = formatCurrency(totals.receitaContrato);
@@ -6088,11 +6230,17 @@
                 cfResEl.textContent = formatCurrency(totals.resultadoFinanceiroFluxoCaixa);
             }
 
-            const rowDefs = ES_ROW_DEFINITIONS;
+            const customRows = getCustomAccountSettlementBudgetRows(allMonthsData);
+            const subInsertIdx = ES_ROW_DEFINITIONS.findIndex(r => r.key === 'despNaoOperacionais') + 1;
+            const rowDefs = [
+                ...ES_ROW_DEFINITIONS.slice(0, subInsertIdx),
+                ...customRows,
+                ...ES_ROW_DEFINITIONS.slice(subInsertIdx)
+            ];
 
             tbody.innerHTML = rowDefs.map(def => {
                 const cellsHtml = visibleMonthsData.map(mData => {
-                    const val = Number(mData[def.key] || 0);
+                    const val = getAccountSettlementRowValue(mData, def.key);
                     if (def.type === 'manual') {
                         return `
                             <td class="py-0.5 px-1 text-right whitespace-nowrap">
@@ -6110,7 +6258,7 @@
                     return `<td class="py-1.5 px-1 text-right whitespace-nowrap ${negClass}">${formatMatrixMoney(val)}</td>`;
                 }).join('');
 
-                const totVal = Number(totals[def.key] || 0);
+                const totVal = getAccountSettlementRowValue(totals, def.key);
                 const totNegClass = totVal < -0.005 ? 'text-rose-700' : '';
 
                 return `
